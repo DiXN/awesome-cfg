@@ -43,6 +43,7 @@ screen.connect_signal('request::desktop_decoration', function(s)
 end);
 
 local last_client = nil;
+local bottom = true;
 
 --GLOBAL KEYBINDS/BUTTONS
 awful.keyboard.append_global_keybindings({
@@ -64,6 +65,9 @@ awful.keyboard.append_global_keybindings({
 	awful.key({ modkey }, "k", function() awful.client.focus.byidx(1) end),
 	awful.key({ modkey, "Shift" }, "j", function() awful.client.swap.byidx(1) end),
 	awful.key({ modkey, "Shift" }, "k", function() awful.client.swap.byidx(-1) end),
+
+  -- toggle client stack order
+	awful.key({ modkey, "Shift" }, "s", function() bottom = not bottom end),
 
 	-- Resize
 	awful.key({ modkey }, "l", function() awful.tag.incmwfact(0.05) end),
@@ -238,6 +242,8 @@ ruled.notification.connect_signal('request::rules', function()
 		properties = { timeout = 0 }
 	}
 end);
+
+client.connect_signal("manage", function(c) if bottom then awful.client.setslave(c) end end)
 
 -- SPAWNS
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
