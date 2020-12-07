@@ -50,6 +50,7 @@ awful.keyboard.append_global_keybindings({
 	awful.key({ modkey }, "c", function() awful.spawn(config.commands.editor) end),
 	awful.key({ modkey }, "b", function() awful.spawn(config.commands.browser) end),
 	awful.key({ modkey }, "f", function() awful.spawn(config.commands.files) end),
+	awful.key({ modkey }, "n", function() awful.spawn(config.commands.nvidia) end),
 	awful.key({ modkey }, "space", function() awful.spawn(config.commands.rofi) end),
 
 	awful.key({ modkey, "Shift" }, "q", function() if root.elements.powermenu then root.elements.powermenu.show() end end),
@@ -81,6 +82,8 @@ awful.keyboard.append_global_keybindings({
       awful.util.spawn(config.commands.volup) end),
   awful.key({}, "XF86AudioLowerVolume", function()
       awful.util.spawn(config.commands.voldown) end),
+  awful.key({}, "XF86AudioMute", function()
+      awful.util.spawn(config.commands.mute) end),
 
   awful.key({ modkey }, "r", nil, function ()
     if last_client ~= nil then
