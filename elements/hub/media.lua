@@ -57,6 +57,8 @@ return function()
     awful.spawn.easy_async_with_shell(config.commands.vol, function(o)
       vol_slider:set_value(tonumber(o));
     end);
+
+    mute_handling()
   end);
 
   local mute = wibox.widget.textbox();
@@ -190,6 +192,20 @@ return function()
     end;
   end);
 
+  function mute_handling()
+    awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
+      if c == 0 then
+        vol_slider.bar_active_color = config.colors.b..'26';
+        vol_heading.markup = 'Volume <span font="'..config.fonts.tll..'">(muted)</span>';
+        mute.text = config.icons.vol_mute
+      else
+        vol_slider.bar_active_color = config.colors.w;
+        vol_heading.markup = 'Volume: <span font="'..config.fonts.tll..'">'..vol_slider.value..'</span>';
+        mute.text = config.icons.vol_1
+      end;
+    end);
+  end
+
   view.refresh = function()
     local temp_vol = vol_slider.value;
 
@@ -205,17 +221,7 @@ return function()
       vol_slider:set_value(tonumber(o));
     end);
 
-    awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
-      if c == 0 then
-        vol_slider.bar_active_color = config.colors.b..'26';
-        vol_heading.markup = 'Volume <span font="'..config.fonts.tll..'">(muted)</span>';
-        mute.text = config.icons.vol_mute
-      else
-        vol_slider.bar_active_color = config.colors.w;
-        vol_heading.markup = 'Volume: <span font="'..config.fonts.tll..'">'..vol_slider.value..'</span>';
-        mute.text = config.icons.vol_1
-      end;
-    end);
+    mute_handling()
   end
 
   mute:buttons(gears.table.join(
