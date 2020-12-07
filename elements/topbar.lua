@@ -10,6 +10,7 @@ root.elements = root.elements or {};
 
 local capi = {
   awesome = awesome,
+  screen = screen
 }
 
 function make_launcher(s)
@@ -326,13 +327,13 @@ function make_taglist(s)
   root.elements.taglist[s.index] = taglist;
 end
 
-function construct_elements(screen)
-  if not root.elements.utilities or not root.elements.utilities[screen.index] then make_utilities(screen) end;
-  if not root.elements.launcher or not root.elements.launcher[screen.index] then make_launcher(screen) end;
-  if not root.elements.taglist or not root.elements.taglist[screen.index] then make_taglist(screen) end;
-  if not root.elements.power or not root.elements.power[screen.index] then make_power(screen) end;
-  if not root.elements.tray or not root.elements.tray[screen.index] then make_tray(screen) end;
-  if not root.elements.date or not root.elements.date[screen.index] then make_date(screen) end;
+function construct_elements(s)
+  if not root.elements.utilities or not root.elements.utilities[s.index] then make_utilities(s) end;
+  if not root.elements.launcher or not root.elements.launcher[s.index] then make_launcher(s) end;
+  if not root.elements.taglist or not root.elements.taglist[s.index] then make_taglist(s) end;
+  if not root.elements.power or not root.elements.power[s.index] then make_power(s) end;
+  if s == capi.screen.primary then if not root.elements.tray or not root.elements.tray[s.index] then make_tray(s) end end;
+  if not root.elements.date or not root.elements.date[s.index] then make_date(s) end;
 end
 
 function setup_bar()
@@ -372,7 +373,7 @@ function setup_bar()
       for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = true end;
       for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = true end;
       for i in pairs(root.elements.power) do root.elements.power[i].visible = true end;
-      for i in pairs(root.elements.tray) do root.elements.tray[i].visible = true end;
+      for i in pairs(root.elements.tray) do if root.elements.tray[i] then root.elements.tray[i].visible = true end end;
       for i in pairs(root.elements.date) do root.elements.date[i].visible = true end;
     end,
     hide = function()
@@ -388,6 +389,6 @@ end
 
 return function()
   setup_bar()
-  screen.connect_signal("added", function(screen) os.execute('sleep 2'); setup_bar() end)
+  screen.connect_signal("added", function(screen) awesome.restart() end)
 end
 
