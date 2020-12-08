@@ -105,7 +105,6 @@ function make_date(s)
     width = config.topbar.dw,
   });
 
-
   date:setup {
     layout = wibox.container.place,
     valign = "center",
@@ -327,10 +326,104 @@ function make_taglist(s)
   root.elements.taglist[s.index] = taglist;
 end
 
+function make_tasklist(s)
+  local tasklist_buttons = gears.table.join(
+    awful.button({ }, 1, function (c)
+    if c == client.focus then
+      c.minimized = true
+    else
+      c:emit_signal(
+        "request::activate",
+        "tasklist",
+        {raise = true}
+      )
+    end
+    end),
+    awful.button({ }, 3, function()
+      awful.menu.client_list({ theme = { width = 250 } })
+    end),
+    awful.button({ }, 4, function ()
+      awful.client.focus.byidx(1)
+    end),
+    awful.button({ }, 5, function ()
+      awful.client.focus.byidx(-1)
+    end)
+  )
+
+  local uw = config.global.m-4;
+  local width = (s.workarea.width / 2) - s.workarea.x - (config.topbar.w) - uw / 2 - config.global.m * 23;
+
+  local tasklist = wibox({
+    screen = s,
+    visible = false,
+    type = "utility",
+    bg = config.colors.f,
+    fg = config.colors.xf,
+    width = width,
+    height = config.topbar.h,
+    font = config.fonts.ttl
+  });
+
+  -- tasklist:connect_signal("mouse::leave", function(t) t.visible = false end)
+
+  tasklist:struts({ top = config.topbar.h + config.global.m });
+  tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 6;
+  tasklist.y = config.global.m;
+
+  beautiful.tasklist_bg_normal = config.colors.b .. '70';
+  beautiful.tasklist_bg_minimize = config.colors.w ..'90';
+  beautiful.tasklist_fg_minimize = config.colors.b;
+  beautiful.tasklist_font = config.fonts.tll;
+
+  tasklist:setup {
+    layout = wibox.container.place,
+    halign = 'left',
+    content_fill_horizontal = true,
+    width = width,
+    awful.widget.tasklist {
+      screen  = s,
+      filter  = awful.widget.tasklist.filter.currenttags,
+      buttons = tasklist_buttons,
+      layout = {
+        spacing = 10,
+        layout  = wibox.layout.flex.horizontal
+      },
+      widget_template = {
+        {
+          {
+            {
+              {
+                id     = 'icon_role',
+                widget = wibox.widget.imagebox,
+              },
+              margins = 5,
+              widget  = wibox.container.margin,
+            },
+            {
+              id     = 'text_role',
+              widget = wibox.widget.textbox,
+            },
+            layout = wibox.layout.fixed.horizontal,
+          },
+          left  = 5,
+          right = 5,
+          widget = wibox.container.margin
+        },
+        id     = 'background_role',
+        widget = wibox.container.background,
+      },
+    }
+  }
+
+  root.elements.tasklist = root.elements.tasklist or {};
+  root.elements.tasklist[s.index] = tasklist;
+end
+
 function construct_elements(s)
   if not root.elements.utilities or not root.elements.utilities[s.index] then make_utilities(s) end;
   if not root.elements.launcher or not root.elements.launcher[s.index] then make_launcher(s) end;
   if not root.elements.taglist or not root.elements.taglist[s.index] then make_taglist(s) end;
+  if not root.elements.tasklist or not root.elements.tasklist[s.index] then make_tasklist(s) end;
   if not root.elements.power or not root.elements.power[s.index] then make_power(s) end;
   if s == capi.screen.primary then if not root.elements.tray or not root.elements.tray[s.index] then make_tray(s) end end;
   if not root.elements.date or not root.elements.date[s.index] then make_date(s) end;
@@ -372,6 +465,7 @@ function setup_bar()
       for i in pairs(root.elements.utilities) do root.elements.utilities[i].visible = true end;
       for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = true end;
       for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = true end;
+      for i in pairs(root.elements.tasklist) do root.elements.tasklist[i].visible = true end;
       for i in pairs(root.elements.power) do root.elements.power[i].visible = true end;
       for i in pairs(root.elements.tray) do if root.elements.tray[i] then root.elements.tray[i].visible = true end end;
       for i in pairs(root.elements.date) do root.elements.date[i].visible = true end;
@@ -380,6 +474,7 @@ function setup_bar()
       for i in pairs(root.elements.utilities) do root.elements.utilities[i].visible = false end;
       for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = false end;
       for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = false end;
+      for i in pairs(root.elements.tasklist) do root.elements.tasklist[i].visible = false end;
       for i in pairs(root.elements.power) do root.elements.power[i].visible = false end;
       for i in pairs(root.elements.tray) do root.elements.tray[i].visible = false end;
       for i in pairs(root.elements.date) do root.elements.date[i].visible = false end;
