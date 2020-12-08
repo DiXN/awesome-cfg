@@ -96,6 +96,8 @@ awful.keyboard.append_global_keybindings({
   end)
 });
 
+client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
 -- TAG KEYBINDS
 for i = 0, 9 do
@@ -107,9 +109,10 @@ for i = 0, 9 do
 			local tag = root.tags()[i];
 			if tag then tag:view_only() end;
 		end),
-		awful.key({ modkey, 'Control'}, spot, function()
+		awful.key({ modkey, 'Shift'}, spot, function()
 			local tag = root.tags()[i];
 			if tag and client.focus then client.focus:move_to_tag(tag) end;
+	    tag:view_only();
 		end)
 	});
 end
