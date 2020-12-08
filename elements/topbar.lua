@@ -419,6 +419,10 @@ function make_tasklist(s)
   root.elements.tasklist[s.index] = tasklist;
 end
 
+function get_tasklist()
+  return root.elements.tasklist
+end
+
 function construct_elements(s)
   if not root.elements.utilities or not root.elements.utilities[s.index] then make_utilities(s) end;
   if not root.elements.launcher or not root.elements.launcher[s.index] then make_launcher(s) end;
@@ -465,7 +469,6 @@ function setup_bar()
       for i in pairs(root.elements.utilities) do root.elements.utilities[i].visible = true end;
       for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = true end;
       for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = true end;
-      for i in pairs(root.elements.tasklist) do root.elements.tasklist[i].visible = true end;
       for i in pairs(root.elements.power) do root.elements.power[i].visible = true end;
       for i in pairs(root.elements.tray) do if root.elements.tray[i] then root.elements.tray[i].visible = true end end;
       for i in pairs(root.elements.date) do root.elements.date[i].visible = true end;
@@ -485,5 +488,6 @@ end
 return function()
   setup_bar()
   screen.connect_signal("added", function(screen) awesome.restart() end)
+  root.elements.topbar.tasklist = get_tasklist;
 end
 

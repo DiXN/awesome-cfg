@@ -9,8 +9,8 @@ local beautiful = require('beautiful');
 require('./errors')();
 
 local capi = {
-    awesome = awesome,
-    screen = screen
+  awesome = awesome,
+  screen = screen
 }
 
 -- ELEMENT STORE
@@ -41,6 +41,12 @@ screen.connect_signal('request::desktop_decoration', function(s)
 	end
 	s.tags[1]:view_only();
 end);
+
+-- ELEMENTS
+if not root.elements.hub then require('elements.hub')() end;
+if not root.elements.topbar then require('elements.topbar')() end;
+if not root.elements.tagswitcher then require('elements.tagswitch')() end;
+if not root.elements.powermenu then require('elements.powermenu')() end;
 
 local last_client = nil;
 local bottom = true;
@@ -108,6 +114,7 @@ for i = 0, 9 do
 		awful.key({ modkey }, spot, function()
 			local tag = root.tags()[i];
 			if tag then tag:view_only() end;
+      bar_hygenie()
 		end),
 		awful.key({ modkey, 'Shift'}, spot, function()
 			local tag = root.tags()[i];
@@ -246,7 +253,52 @@ ruled.notification.connect_signal('request::rules', function()
 	}
 end);
 
-client.connect_signal("manage", function(c) if bottom then awful.client.setslave(c) end end)
+function count_clients()
+  local n = 0
+
+  for _, c in ipairs(client.get()) do
+    if awful.tag.selected() == c.first_tag then n = n + 1 end
+  end
+
+  return n
+end
+
+client.connect_signal("manage", function(c)
+  if bottom then awful.client.setslave(c) end
+  local clients = count_clients()
+
+  if clients >= 2 then
+    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = true
+  end
+end)
+
+client.connect_signal("unmanage", function(c)
+  local clients = count_clients()
+
+  if clients < 2 then
+    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
+  end
+end)
+
+function bar_hygenie()
+  local clients = count_clients()
+  if clients < 2 then
+    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
+  end
+
+  if clients >= 2 then
+    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = true
+  end
+end
+
+-- switch to client of other tag
+client.connect_signal("request::activate", function(c)
+  if c then
+    local t = c.first_tag
+    t:view_only()
+    bar_hygenie()
+  end
+end)
 
 -- SPAWNS
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
@@ -255,11 +307,6 @@ awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
 awful.spawn.with_shell("nm-applet &");
 awful.spawn.with_shell('instantmouse s "$(iconf mousespeed)"');
 
--- ELEMENTS
-if not root.elements.hub then require('elements.hub')() end;
-if not root.elements.topbar then require('elements.topbar')() end;
-if not root.elements.tagswitcher then require('elements.tagswitch')() end;
-if not root.elements.powermenu then require('elements.powermenu')() end;
 
 -- IDLE
 awful.spawn.with_line_callback(config.commands.idle, {
