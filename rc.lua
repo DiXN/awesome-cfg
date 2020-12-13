@@ -258,17 +258,21 @@ end);
 
 function count_clients()
   local n = 0
+  local last = nil
 
   for _, c in ipairs(client.get()) do
-    if awful.tag.selected() == c.first_tag then n = n + 1 end
+    if awful.tag.selected() == c.first_tag then
+      n = n + 1
+      last = c
+    end
   end
 
-  return n
+  return n, last
 end
 
 client.connect_signal("manage", function(c)
   if bottom then awful.client.setslave(c) end
-  local clients = count_clients()
+  local clients, _ = count_clients()
 
   if clients >= 2 then
     root.elements.topbar.tasklist()[awful.screen.focused().index].visible = true
@@ -276,15 +280,18 @@ client.connect_signal("manage", function(c)
 end)
 
 client.connect_signal("unmanage", function(c)
-  local clients = count_clients()
+  local clients, last = count_clients()
 
   if clients < 2 then
     root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
   end
+
+  client.focus = last
+  c:raise()
 end)
 
 function bar_hygenie()
-  local clients = count_clients()
+  local clients, _ = count_clients()
   if clients < 2 then
     root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
   end
@@ -310,7 +317,6 @@ awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
 awful.spawn.with_shell("nm-applet &");
-awful.spawn.with_shell("telegram-desktop &");
 awful.spawn.with_shell('instantmouse s "$(iconf mousespeed)"');
 
 
