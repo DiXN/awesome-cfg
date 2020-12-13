@@ -223,7 +223,9 @@ ruled.client.connect_signal("request::rules", function()
 		properties = {
 			floating = true,
 			placement = awful.placement.centered,
-			size_hints_honor = true,
+			above = true,
+			ontop = true,
+			size_hints_honor = true
 		}
 	}
 	ruled.client.append_rule {
@@ -298,6 +300,8 @@ client.connect_signal("request::activate", function(c)
     local t = c.first_tag
     t:view_only()
     bar_hygenie()
+
+    if c.floating then c.ontop = true end
   end
 end)
 
