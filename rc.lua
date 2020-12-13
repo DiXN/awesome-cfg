@@ -310,6 +310,7 @@ awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
 awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
 awful.spawn.with_shell("nm-applet &");
+awful.spawn.with_shell("telegram-desktop &");
 awful.spawn.with_shell('instantmouse s "$(iconf mousespeed)"');
 
 
