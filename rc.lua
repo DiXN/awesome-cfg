@@ -74,6 +74,7 @@ awful.keyboard.append_global_keybindings({
 
   -- toggle client stack order
 	awful.key({ modkey, "Shift" }, "s", function() bottom = not bottom end),
+	awful.key({ modkey, "Shift" }, "Return", function() awful.client.setmaster(client.focus) end),
 
 	-- Resize
 	awful.key({ modkey }, "l", function() awful.tag.incmwfact(0.05) end),
