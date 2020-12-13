@@ -351,13 +351,13 @@ function make_tasklist(s)
   )
 
   local uw = config.global.m-4;
-  local width = (s.workarea.width / 2) - s.workarea.x - (config.topbar.w) - uw / 2 - config.global.m * 23;
+  local width = (s.workarea.width / 2) - (config.topbar.w) - uw / 2 - config.global.m * 36;
 
   local tasklist = wibox({
     screen = s,
     visible = false,
     type = "utility",
-    bg = config.colors.f,
+    bg = config.colors.t,
     fg = config.colors.xf,
     width = width,
     height = config.topbar.h,
@@ -367,12 +367,13 @@ function make_tasklist(s)
   -- tasklist:connect_signal("mouse::leave", function(t) t.visible = false end)
 
   tasklist:struts({ top = config.topbar.h + config.global.m });
-  tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 6;
+  tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 12;
   tasklist.y = config.global.m;
 
-  beautiful.tasklist_bg_normal = config.colors.b .. '70';
-  beautiful.tasklist_bg_minimize = config.colors.w ..'90';
-  beautiful.tasklist_fg_minimize = config.colors.b;
+  beautiful.tasklist_bg_normal = config.colors.w .. '60';
+  beautiful.tasklist_fg_normal = config.colors.b;
+  beautiful.tasklist_bg_minimize = config.colors.b ..'90';
+  beautiful.tasklist_fg_minimize = config.colors.w;
   beautiful.tasklist_font = config.fonts.tll;
 
   tasklist:setup {
