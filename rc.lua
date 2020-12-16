@@ -51,6 +51,9 @@ if not root.elements.powermenu then require('elements.powermenu')() end;
 local last_client = nil;
 local bottom = true;
 
+local bar_visibility = {};
+awful.screen.connect_for_each_screen(function(s) bar_visibility[s.index] = true end);
+
 --GLOBAL KEYBINDS/BUTTONS
 awful.keyboard.append_global_keybindings({
 	awful.key({ modkey }, "Return", function() awful.spawn(config.commands.terminal) end),
@@ -66,6 +69,18 @@ awful.keyboard.append_global_keybindings({
 	awful.key({ modkey, "Shift" }, "p", function() awful.spawn(config.commands.scrot) end),
 	-- awful.key({ modkey, "Shift" }, "r", function() if root.elements.powermenu then root.elements.powermenu.lock(awesome.restart) end end),
   awful.key({ modkey, "Shift" }, "r", awesome.restart),
+
+  awful.key({ modkey, "Shift"}, "b", function()
+    local screen_idx = awful.screen.focused().index
+
+    if bar_visibility[screen_idx] == true then
+      root.elements.topbar.hide(screen_idx)
+      bar_visibility[screen_idx] = false
+    else
+      root.elements.topbar.show(screen_idx)
+      bar_visibility[screen_idx] = true
+    end
+  end),
 
 	awful.key({ modkey }, "j", function() awful.client.focus.byidx(-1) end),
 	awful.key({ modkey }, "k", function() awful.client.focus.byidx(1) end),
@@ -215,6 +230,8 @@ ruled.client.connect_signal("request::rules", function()
 			floating = true,
 			placement = awful.placement.centered,
 			size_hints_honor = true,
+			above = true,
+			ontop = true,
 		}
 	}
 	ruled.client.append_rule {
@@ -223,8 +240,6 @@ ruled.client.connect_signal("request::rules", function()
 		properties = {
 			floating = true,
 			placement = awful.placement.centered,
-			above = true,
-			ontop = true,
 			size_hints_honor = true
 		}
 	}
@@ -262,6 +277,7 @@ function count_clients()
 
   for _, c in ipairs(client.get()) do
     if awful.tag.selected() == c.first_tag then
+      if not c.floating then c.ontop = false end
       n = n + 1
       last = c
     end
@@ -275,7 +291,8 @@ client.connect_signal("manage", function(c)
   local clients, _ = count_clients()
 
   if clients >= 2 then
-    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = true
+    local screen_idx = awful.screen.focused().index
+    if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
   end
 end)
 
@@ -283,7 +300,8 @@ client.connect_signal("unmanage", function(c)
   local clients, last = count_clients()
 
   if clients < 2 then
-    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
+    local screen_idx = awful.screen.focused().index
+    if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
   end
 
   client.focus = last
@@ -292,12 +310,14 @@ end)
 
 function bar_hygenie()
   local clients, _ = count_clients()
+  local screen_idx = awful.screen.focused().index
+
   if clients < 2 then
-    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = false
+    if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
   end
 
   if clients >= 2 then
-    root.elements.topbar.tasklist()[awful.screen.focused().index].visible = true
+    if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
   end
 end
 

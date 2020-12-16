@@ -466,29 +466,35 @@ function setup_bar()
   end
 
   root.elements.topbar = {
-    show = function()
-      for i in pairs(root.elements.utilities) do root.elements.utilities[i].visible = true end;
-      for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = true end;
-      for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = true end;
-      for i in pairs(root.elements.power) do root.elements.power[i].visible = true end;
-      for i in pairs(root.elements.tray) do if root.elements.tray[i] then root.elements.tray[i].visible = true end end;
-      for i in pairs(root.elements.date) do root.elements.date[i].visible = true end;
-    end,
-    hide = function()
-      for i in pairs(root.elements.utilities) do root.elements.utilities[i].visible = false end;
-      for i in pairs(root.elements.launcher) do root.elements.launcher[i].visible = false end;
-      for i in pairs(root.elements.taglist) do root.elements.taglist[i].visible = false end;
-      for i in pairs(root.elements.tasklist) do root.elements.tasklist[i].visible = false end;
-      for i in pairs(root.elements.power) do root.elements.power[i].visible = false end;
-      for i in pairs(root.elements.tray) do root.elements.tray[i].visible = false end;
-      for i in pairs(root.elements.date) do root.elements.date[i].visible = false end;
-    end
+    show = show,
+    hide = hide
   }
+end
+
+function show(idx)
+  for i in pairs(root.elements.utilities) do root.elements.utilities[idx or i].visible = true end;
+  for i in pairs(root.elements.launcher) do root.elements.launcher[idx or i].visible = true end;
+  for i in pairs(root.elements.taglist) do root.elements.taglist[idx or i].visible = true end;
+  for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = true end;
+  for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = true end end;
+  for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = true end;
+end
+
+function hide(idx)
+  for i in pairs(root.elements.utilities) do root.elements.utilities[idx or i].visible = false end;
+  for i in pairs(root.elements.launcher) do root.elements.launcher[idx or i].visible = false end;
+  for i in pairs(root.elements.taglist) do root.elements.taglist[idx or i].visible = false end;
+  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i].visible = false end;
+  for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = false end;
+  for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = false end end;
+  for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = false end;
 end
 
 return function()
   setup_bar()
   screen.connect_signal("added", function(screen) awesome.restart() end)
   root.elements.topbar.tasklist = get_tasklist;
+  root.elements.topbar.show = show;
+  root.elements.topbar.hide = hide;
 end
 
