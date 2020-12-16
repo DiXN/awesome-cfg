@@ -150,7 +150,7 @@ local config = {
     btdevices = gears.filesystem.get_configuration_dir()..'scripts/btdevices.sh',
     btdevice = gears.filesystem.get_configuration_dir()..'scripts/btdevice.sh',
     spotify_state = gears.filesystem.get_configuration_dir()..'scripts/spotify.sh',
-    idle = 'bash -c "xidlehook --not-when-audio --timer 500 \'echo lock\' \'\' --timer 120 \'echo suspend\' \'\'"',
+    idle = 'bash -c "xidlehook --not-when-audio --timer 500 \'echo lock\' \'\' --timer 5000 \'echo suspend\' \'\'"',
     proccmd = 'bash -c "ps -eo comm:45,%mem,%cpu --sort=-%cpu,-%mem | head -n 6"',
     synccmd = 'bash -c "yay -Syy"',
     updatescmd = 'bash -c "yay -Sup | wc -l"',
