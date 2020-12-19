@@ -17,7 +17,7 @@ function add_new_tag()
   local total = root.tags();
 
   if(#total >= 10) then return end;
-  
+
   awful.tag.add(#total+1, {
     screen = awful.screen.focused(),
     layout = awful.screen.focused().selected_tag.layout,
@@ -52,8 +52,8 @@ function make_taglist(s)
   });
 
   local buttons = gears.table.join(
-    awful.button({ 'Mod4' }, 1, function(t) t:view_only() end)
-    --awful.button({ 'Mod4' }, 3, delete_tag)
+    awful.button({ 'Mod4' }, 1, function(t) t:view_only() end),
+    awful.button({ 'Mod4' }, 3, delete_tag)
   );
 
   local taglist = awful.widget.taglist({
