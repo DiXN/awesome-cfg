@@ -262,19 +262,21 @@ return function()
   }
 
   awful.widget.watch(config.commands.ramcmd, 5, function(w,o)
-    local n = tonumber(o);
+  local n = tonumber(o);
     ram_progress:set_value(n);
     ram_value.text = o:gsub("^%s*(.-)%s*$", "%1").."%";
+  end);
+
+  awful.widget.watch(config.commands.cpucmd, 5, function(w,o,e,r,c)
+    local n = tonumber(o);
+    cpu_progress:set_value(n);
+    cpu_value.text = o:gsub("^%s*(.-)%s*$", "%1").."%";
+
     for _,i in pairs(root.elements.mem_icons) do
       if n >= 75 then i.update(config.icons.mem, config.colors.x9)
       elseif n >= 50 then i.update(config.icons.mem, config.colors.x11)
       else i.update(config.icons.mem, config.colors.x10) end;
     end;
-  end);
-
-  awful.widget.watch(config.commands.cpucmd, 5, function(w,o,e,r,c)
-    cpu_progress:set_value(tonumber(o));
-    cpu_value.text = o:gsub("^%s*(.-)%s*$", "%1").."%";
   end);
 
   awful.widget.watch(config.commands.diskcmd, 5, function(w,o)
@@ -285,6 +287,16 @@ return function()
 
   awful.widget.watch(config.commands.proccmd, 5, function(w, o)
     proc_text.text = o:gsub("^%s*(.-)%s*$", "%1");
+  end);
+
+  awful.widget.watch(config.commands.vol, 2, function(w,o,e,r,c)
+    local n = tonumber(o);
+
+    for _, i in pairs(root.elements.vol_icons) do
+      if n >= 75 then i.update(config.icons.vol_3, config.colors.x9)
+      elseif n >= 50 then i.update(config.icons.vol_2, config.colors.x11)
+      else i.update(config.icons.vol_1, config.colors.x10) end;
+    end;
   end);
 
   if config.topbar.utilities.bat then
