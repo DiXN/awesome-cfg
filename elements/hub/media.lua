@@ -49,7 +49,7 @@ return function()
   vol_slider.minimum = 0;
   vol_slider.maximum = 100;
   vol_slider:connect_signal('property::value', function()
-    awful.spawn.with_shell(config.commands.setvol..tostring(vol_slider.value));
+    awful.spawn.with_shell(config.commands.setvol.. ' ' ..tostring(vol_slider.value));
     vol_heading.markup = 'Volume: <span font="'..config.fonts.tll..'">'..vol_slider.value..'</span>';
   end);
 
