@@ -172,14 +172,17 @@ client.connect_signal("request::default_mousebindings", function(c)
       c:activate { context = "mouse_move", raise = true }
     end),
     awful.button({ modkey }, 1, function (c)
-      c.floating = true;
+      if not c.floating then c.floating = true end
       c:activate { context = "mouse_click", action = "mouse_move" }
     end),
     awful.button({ modkey }, 3, function (c)
       c:activate { context = "mouse_click", action = "mouse_resize" }
     end),
     awful.button({ modkey }, 2, function (c)
-      c.floating = false;
+      if c.floating then
+        c.floating = false
+        c:emit_signal("tiled")
+      end
     end),
     awful.button({ modkey, "r"}, 5, function (c)
       last_client = c;
@@ -201,66 +204,45 @@ end);
 
 -- RULES
 ruled.client.connect_signal("request::rules", function()
-	ruled.client.append_rule {
-		id = 'global',
-		rule = { },
-		properties = {
-			raise = true,
-			switch_to_tags = true,
-			size_hints_honor = false,
-			screen = awful.screen.preferred,
-			focus = awful.client.focus.filter,
-			placement = awful.placement.no_overlap+awful.placement.no_offscreen,
-		}
-	}
-	ruled.client.append_rule {
-		id = 'browser',
-		rule = { role = 'browser' },
-		properties = {
-			floating = false,
-			fullscreen = false,
-			maximized = false,
-			size_hints_honor = false,
-		}
-	}
-	ruled.client.append_rule {
-		id = 'files',
-		rule = { role = 'GtkFileChooserDialog' },
-		properties = {
-			floating = true,
-			placement = awful.placement.centered,
-			size_hints_honor = true,
-			above = true,
-			ontop = true,
-		}
-	}
-	ruled.client.append_rule {
-		id = 'files',
-		rule = { type = 'dialog' },
-		properties = {
-			floating = true,
-			placement = awful.placement.centered,
-			size_hints_honor = true
-		}
-	}
-	ruled.client.append_rule {
-		id = 'files',
-		rule = { class = 'Nitrogen' },
-		properties = {
-			floating = true,
-			placement = awful.placement.centered,
-			size_hints_honor = true,
-		}
-	}
-	ruled.client.append_rule {
-		id = 'files',
-		rule = { class = 'Org.gnome.Nautilus' },
-		properties = {
-			floating = true,
-			placement = awful.placement.centered,
-			size_hints_honor = true,
-		}
-	}
+  -- All clients will match this rule.
+  ruled.client.append_rule {
+    id         = "global",
+    rule       = { },
+    properties = {
+      focus     = awful.client.focus.filter,
+      raise     = true,
+      screen    = awful.screen.preferred,
+      placement = awful.placement.no_overlap+awful.placement.no_offscreen
+    }
+  }
+
+  -- Floating clients.
+  ruled.client.append_rule {
+    id       = "floating",
+    rule_any = {
+      instance = { "copyq", "pinentry" },
+      class    = {
+        "Arandr", "Blueman-manager", "Gpick", "Kruler", "Sxiv",
+        "Tor Browser", "Wpa_gui", "veromix", "xtightvncviewer"
+      },
+      name    = {
+        "Event Tester",
+        "Media viewer"
+      },
+      role    = {
+        "AlarmWindow",
+        "ConfigManager",
+        "pop-up",
+      }
+    },
+    properties = { floating = true }
+  }
+
+  ruled.client.append_rule {
+    id         = "titlebars",
+    rule_any   = { type = { "normal", "dialog" } },
+    properties = { titlebars_enabled = true      }
+  }
 end);
 
 -- NOTIFICATIONS
@@ -277,7 +259,6 @@ function count_clients()
 
   for _, c in ipairs(client.get()) do
     if awful.tag.selected() == c.first_tag then
-      if not c.floating then c.ontop = false end
       n = n + 1
       last = c
     end
@@ -303,9 +284,6 @@ client.connect_signal("unmanage", function(c)
     local screen_idx = awful.screen.focused().index
     if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
   end
-
-  client.focus = last
-  c:raise()
 end)
 
 function bar_hygenie()
@@ -327,9 +305,22 @@ client.connect_signal("request::activate", function(c)
     local t = c.first_tag
     t:view_only()
     bar_hygenie()
-
-    if c.floating then c.ontop = true end
   end
+end)
+
+client.connect_signal("property::floating", function(c)
+  if c.floating then
+    c:raise()
+    c.above = true
+    c.ontop = true
+    client.focus = c
+  end
+end)
+
+client.connect_signal("tiled", function(c)
+  c:lower()
+  c.above = false
+  c.ontop = false
 end)
 
 -- SPAWNS
@@ -353,3 +344,4 @@ awful.spawn.with_line_callback(config.commands.idle, {
 
 os.execute('sleep 0.1');
 if root.elements.topbar then root.elements.topbar.show() end;
+
