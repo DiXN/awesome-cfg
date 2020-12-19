@@ -245,6 +245,31 @@ ruled.client.connect_signal("request::rules", function()
   }
 end);
 
+-- focuse previous client (https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/)
+screen.connect_signal('tag::history::update', function()
+  gears.timer {
+    timeout       = 0.1,
+    single_shot   = true,
+    autostart     = true,
+    callback      = function()
+      if mouse.current_client ~= nil then
+        mouse.current_client:activate()
+      else
+        local t = awful.screen.focused().selected_tag
+        if not t then return end
+        local clients = t:clients()
+        if not clients then return end
+        for _, c in ipairs(clients) do
+          if c.minimized == false then
+            c:activate()
+            break
+          end
+        end
+      end
+    end
+  }
+end)
+
 -- NOTIFICATIONS
 ruled.notification.connect_signal('request::rules', function()
 	ruled.notification.append_rule {
