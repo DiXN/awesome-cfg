@@ -5,7 +5,10 @@ local naughty = require('naughty');
 local beautiful = require('beautiful');
 local config = require('helpers.config');
 local rounded = require('helpers.rounded');
+local gfs = require('gears.filesystem')
+local themes_path = gfs.get_themes_dir()
 local xrdb = beautiful.xresources.get_current_theme();
+
 root.elements = root.elements or {};
 
 local capi = {
@@ -127,6 +130,44 @@ function make_date(s)
   root.elements.date[s.index] = date;
 end
 
+function make_layoutbox(s)
+  local l = awful.widget.layoutbox {
+    screen  = s,
+    buttons = {
+      awful.button({ }, 1, function () awful.layout.inc( 1) end),
+      awful.button({ }, 3, function () awful.layout.inc(-1) end),
+      awful.button({ }, 4, function () awful.layout.inc(-1) end),
+      awful.button({ }, 5, function () awful.layout.inc( 1) end),
+    }
+  }
+
+  beautiful.layout_fairh = themes_path.."default/layouts/fairhw.png"
+  beautiful.layout_fairv = themes_path.."default/layouts/fairvw.png"
+  beautiful.layout_floating  = themes_path.."default/layouts/floatingw.png"
+  beautiful.layout_max = themes_path.."default/layouts/maxw.png"
+  beautiful.layout_tile = themes_path.."default/layouts/tilew.png"
+  beautiful.layout_spiral  = themes_path.."default/layouts/spiralw.png"
+  beautiful.layout_dwindle = themes_path.."default/layouts/dwindlew.png"
+
+  local layout = wibox({
+    screen = s,
+    type = 'dock',
+    height = config.topbar.h,
+    width = config.topbar.h,
+    bg = config.colors.t,
+    shape = rounded(),
+    shape_clip = true,
+    widget = l,
+  })
+
+  layout:struts({ top = config.topbar.h + config.global.m });
+  layout.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x) - config.topbar.dw - 40;
+  layout.y = config.global.m;
+
+  root.elements.layout = root.elements.layout or {};
+  root.elements.layout[s.index] = layout;
+end
+
 function make_tray(s)
   local t = wibox.widget.systray();
   t.visible = true;
@@ -157,7 +198,7 @@ function make_tray(s)
     height = config.topbar.h,
     width = 1,
     bg = config.colors.b,
-    shape = gears.shape.rounded_rect,
+    shape = rounded(),
     shape_clip = true,
     widget = syst,
   })
@@ -174,7 +215,7 @@ function make_tray(s)
 
     tray.width = width
     tray:struts({ top = config.topbar.h + config.global.m });
-    tray.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x) - config.topbar.dw - 3 - tray.width;
+    tray.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x) - config.topbar.dw - 10 - tray.width - 40;
     tray.y = config.global.m;
   end)
 
@@ -432,6 +473,7 @@ function construct_elements(s)
   if not root.elements.power or not root.elements.power[s.index] then make_power(s) end;
   if s == capi.screen.primary then if not root.elements.tray or not root.elements.tray[s.index] then make_tray(s) end end;
   if not root.elements.date or not root.elements.date[s.index] then make_date(s) end;
+  if not root.elements.layout or not root.elements.layout[s.index] then make_layoutbox(s) end;
 end
 
 function setup_bar()
@@ -478,6 +520,7 @@ function show(idx)
   for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = true end;
   for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = true end end;
   for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = true end;
+  for i in pairs(root.elements.date) do root.elements.layout[idx or i].visible = true end;
 end
 
 function hide(idx)
@@ -488,6 +531,7 @@ function hide(idx)
   for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = false end;
   for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = false end end;
   for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = false end;
+  for i in pairs(root.elements.date) do root.elements.layout[idx or i].visible = false end;
 end
 
 return function()
