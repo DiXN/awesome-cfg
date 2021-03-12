@@ -6,6 +6,7 @@ local ruled = require('ruled');
 local naughty = require('naughty');
 local config = require('helpers.config');
 local beautiful = require('beautiful');
+local inspect = require('inspect')
 require('./errors')();
 require('./elements/fake')()
 
@@ -38,11 +39,16 @@ end);
 
 -- TAGS/LAYOUTS
 screen.connect_signal('request::desktop_decoration', function(s)
-  if s.index == 1 then
-    awful.tag({1,2,3}, s, awful.layout.layouts[1]);
-  else
-    awful.tag({4,5,6}, s, awful.layout.layouts[1]);
+  local tags = {}
+  local tag_size = 4
+
+  for i = ((s.index - 1) * tag_size) + 1, s.index * tag_size, 1
+  do
+    tags[i - ((s.index - 1) * tag_size)] = i
   end
+
+  awful.tag(tags, s, awful.layout.layouts[1])
+
   s.tags[1]:view_only();
 end);
 
