@@ -117,12 +117,20 @@ awful.keyboard.append_global_keybindings({
   awful.key({}, "XF86AudioMute", function()
       awful.util.spawn(config.commands.mute) end),
 
-  awful.key({ modkey }, "r", nil, function ()
+awful.keygrabber {
+  keybindings = {
+    {{ modkey }, 'r', function() last_client = client.focus end}
+  },
+  stop_key           = modkey,
+  stop_event         = 'release',
+  stop_callback      = function()
     if last_client ~= nil then
       client.focus:swap(last_client)
+      client.focus = last_client
     end;
-  end)
-});
+  end,
+  export_keybindings = true,
+}
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
