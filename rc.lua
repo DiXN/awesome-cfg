@@ -95,8 +95,8 @@ awful.keyboard.append_global_keybindings({
 	-- Resize
 	awful.key({ modkey }, "l", function() awful.tag.incmwfact(0.05) end),
 	awful.key({ modkey }, "h", function() awful.tag.incmwfact(-0.05) end),
-	awful.key({ modkey, "Shift" }, "]", function() awful.tag.incmwfact(0.01) end),
-	awful.key({ modkey, "Shift" }, "[", function() awful.tag.incmwfact(-0.01) end),
+	awful.key({ modkey, "Control" }, "l", function() awful.tag.incncol(1) end),
+	awful.key({ modkey, "Control" }, "h", function() awful.tag.incncol(-1) end),
 
   awful.key({ modkey }, "m", function() awful.layout.set(awful.layout.suit.max) end),
   awful.key({ modkey }, "t", function() awful.layout.set(awful.layout.suit.tile) end),
