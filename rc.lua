@@ -383,4 +383,6 @@ awful.spawn.with_line_callback(config.commands.idle, {
 
 os.execute('sleep 0.1');
 if root.elements.topbar then root.elements.topbar.show() end;
+	awful.layout.set(awful.layout.suit.max)
+	awful.layout.set(awful.layout.suit.tile)
 
