@@ -242,11 +242,7 @@ for i = 0, 9 do
       awful.key({ modkey, "Control" }, "Left", function(c) c:move_to_screen(c.screen.index-1) end),
       awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
       awful.key({ modkey, "Shift" }, "f", function(c)
-        if c.fake_full == nil then
-          c.fake_full = true
-        else
-          c.fake_full = not c.fake_full
-        end
+        c.fake_full = not c.fake_full
 
         if c.fake_full then c.fullscreen = true end
       end),
@@ -376,6 +372,7 @@ for i = 0, 9 do
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
     local clients = count_clients()
+    c.fake_full = true
 
     if clients >= 2 then
       local screen_idx = awful.screen.focused().index
