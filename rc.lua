@@ -103,6 +103,11 @@ awful.keyboard.append_global_keybindings({
   awful.key({ modkey }, "a", function() awful.spawn("instantassist") end),
   awful.key({ modkey }, "v", function() awful.spawn("quickmenu") end),
 
+  -- Screenshot
+  awful.key({ modkey }, "Print", function() awful.spawn.with_shell(config.commands.scrotclip) end),
+  awful.key({ modkey, "Shift" }, "Print", function() awful.spawn.with_shell(config.commands.scrot) end),
+  awful.key({ modkey, "Control" }, "Print", function() awful.spawn.with_shell(config.commands.scrotclipsave) end),
+  awful.key({ modkey }, "v", function() awful.spawn("quickmenu") end),
 	--awful.key({}, "space", function () if root.elements.powermenu.prompt then prompt() end end),
 
   awful.key({}, "XF86AudioRaiseVolume", function ()
