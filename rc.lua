@@ -258,6 +258,19 @@ ruled.client.connect_signal("request::rules", function()
     properties = { titlebars_enabled = true      }
   }
 end);
+	-- CLIENT KEYBINDS & BUTTONS
+	client.connect_signal("request::default_keybindings", function(c)
+		awful.keyboard.append_client_keybindings({
+			awful.key({ modkey }, "q", function (c) c.kill(c) end),
+			awful.key({ modkey, "Control" }, "Right", function(c) c:move_to_screen(c.screen.index+1) end),
+			awful.key({ modkey, "Control" }, "Left", function(c) c:move_to_screen(c.screen.index-1) end),
+			awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
+			awful.key({ modkey, "Shift" }, "f", function(c)
+        if c.fake_full == nil then
+          c.fake_full = true
+        else
+          c.fake_full = not c.fake_full
+        end
 
 -- focuse previous client (https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/)
 screen.connect_signal('tag::history::update', function()
@@ -343,6 +356,32 @@ client.connect_signal("request::activate", function(c)
   if c then
     local t = c.first_tag
     t:view_only()
+  client.disconnect_signal("request::geometry", awful.ewmh.geometry)
+  client.connect_signal("request::geometry", function(c, context, ...)
+    if context ~= "fullscreen" then
+      awful.ewmh.geometry(c, context, ...)
+    else
+      if c.fake_full then
+        local geo = c:geometry()
+        c:geometry({
+          width = geo.width,
+          height = geo.height - 1
+        })
+
+        cached_layout = awful.layout.get(awful.screen.focused())
+        awful.layout.set(awful.layout.suit.floating)
+      else
+        awful.ewmh.geometry(c, context, ...)
+      end
+    end
+  end)
+
+	client.connect_signal("property::fullscreen", function(c)
+    if c.fake_full and not c.fullscreen then
+      if cached_layout ~= nil then awful.layout.set(awful.layout.suit.tile) end
+      cached_layout = nil
+    end
+  end)
     bar_hygenie()
   end
 end)
