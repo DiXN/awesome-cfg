@@ -536,7 +536,12 @@ end
 
 return function()
   setup_bar()
-  screen.connect_signal("added", function(screen) awesome.restart() end)
+
+  screen.connect_signal("added", function(scr)
+    if not fake.monitor_has_fake(scr) then
+      awesome.restart()
+    end
+  end)
   root.elements.topbar.tasklist = get_tasklist;
   root.elements.topbar.show = show;
   root.elements.topbar.hide = hide;
