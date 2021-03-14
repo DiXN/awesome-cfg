@@ -356,12 +356,14 @@ for i = 0, 9 do
     }
   end);
 
-  function count_clients()
+  function count_clients(consider_floats)
     local n = 0
 
     if awful.tag.selected() ~= nil then
       for _, c in ipairs(awful.tag.selected():clients()) do
+        if (c.floating == true and consider_floats == true) then goto skip end
         n = n + 1
+        ::skip::
       end
     end
 
@@ -379,8 +381,16 @@ for i = 0, 9 do
     c:emit_signal("client_change")
   end)
 
+  local function reset_mfact(t, num_clients)
+    if num_clients > 2 then
+      t.master_width_factor = 0.38
+    else
+      t.master_width_factor = 0.5
+    end
+  end
+
   client.connect_signal("client_change", function()
-    local num_clients = count_clients()
+    local num_clients = count_clients(true)
     local screen_idx = awful.screen.focused().index
 
     if num_clients < 2 then
@@ -391,12 +401,7 @@ for i = 0, 9 do
     end
 
     local t = awful.tag.selected()
-
-    if num_clients > 2 then
-      t.master_width_factor = 0.38
-    else
-      t.master_width_factor = 0.5
-    end
+    reset_mfact(t, num_clients)
 
     setup_columns(t)
 
@@ -408,7 +413,7 @@ for i = 0, 9 do
   end)
 
   function bar_hygenie()
-    local clients = count_clients()
+    local clients = count_clients(false)
     local screen_idx = awful.screen.focused().index
 
     if clients < 2 then
@@ -462,12 +467,10 @@ for i = 0, 9 do
   end)
 
   client.connect_signal("property::floating", function(c)
-    if c.floating and not c.fullscreen then
-      c:raise()
-      c.above = true
-      c.ontop = true
-      client.focus = c
-    end
+    local num_clients = count_clients(true)
+
+    local t = awful.tag.selected()
+    reset_mfact(t, num_clients)
   end)
 
   client.connect_signal("tiled", function(c)
