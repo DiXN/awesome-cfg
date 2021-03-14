@@ -344,29 +344,6 @@ for i = 0, 9 do
     }
   end);
 
-  -- focuse previous client (https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/)
-  screen.connect_signal('tag::history::update', function()
-    gears.timer {
-      timeout       = 0.1,
-      single_shot   = true,
-      autostart     = true,
-      callback      = function()
-        if mouse.current_client ~= nil then
-          mouse.current_client:activate()
-        else
-          local t = awful.screen.focused().selected_tag
-          local clients = t:clients()
-          for _, c in ipairs(clients) do
-            if c.minimized == false then
-              c:activate()
-              break
-            end
-          end
-        end
-      end
-    }
-  end)
-
   -- NOTIFICATIONS
   ruled.notification.connect_signal('request::rules', function()
     ruled.notification.append_rule {
@@ -399,25 +376,31 @@ for i = 0, 9 do
   end)
 
   client.connect_signal("client_change", function()
-    local clients = count_clients()
+    local num_clients = count_clients()
     local screen_idx = awful.screen.focused().index
 
-    if clients < 2 then
+    if num_clients < 2 then
       if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
     end
-    if clients >= 2 then
+    if num_clients >= 2 then
       if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
     end
 
     local t = awful.tag.selected()
 
-    if clients > 2 then
+    if num_clients > 2 then
       t.master_width_factor = 0.38
     else
       t.master_width_factor = 0.5
     end
 
     setup_columns(t)
+
+    -- https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/ggjom5n?utm_source=share&utm_medium=web2x&context=3
+    local s = awful.screen.focused()
+    local c = awful.client.focus.history.get(s, 0)
+    if c == nil then return end
+    awful.client.focus.byidx(0, c)
   end)
 
   function bar_hygenie()
