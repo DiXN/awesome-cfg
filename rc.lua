@@ -206,6 +206,18 @@ awful.keygrabber {
   export_keybindings = true,
 }
 
+local function setup_columns(t)
+  if t.col_count == nil then t.col_count = 2 end
+
+  if t.layout.name == "tile" and t.col_count < 3 then
+    awful.tag.incncol(1, t)
+    t.master_width_factor = 0.38
+    t.col_count = 3
+  end
+end
+
+tag.connect_signal("property::layout", function(t) setup_columns(t) end)
+
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
@@ -377,22 +389,35 @@ for i = 0, 9 do
 
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
-    local clients = count_clients()
     c.fake_full = true
 
-    if clients >= 2 then
-      local screen_idx = awful.screen.focused().index
-      if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
-    end
+    c:emit_signal("client_change")
   end)
 
   client.connect_signal("unmanage", function(c)
+    c:emit_signal("client_change")
+  end)
+
+  client.connect_signal("client_change", function()
     local clients = count_clients()
+    local screen_idx = awful.screen.focused().index
 
     if clients < 2 then
-      local screen_idx = awful.screen.focused().index
       if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
     end
+    if clients >= 2 then
+      if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
+    end
+
+    local t = awful.tag.selected()
+
+    if clients > 2 then
+      t.master_width_factor = 0.38
+    else
+      t.master_width_factor = 0.5
+    end
+
+    setup_columns(t)
   end)
 
   function bar_hygenie()
