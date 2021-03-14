@@ -322,7 +322,8 @@ for i = 0, 9 do
         instance = { "copyq", "pinentry" },
         class    = {
           "Arandr", "Blueman-manager", "Gpick", "Kruler", "Sxiv",
-          "Tor Browser", "Wpa_gui", "veromix", "xtightvncviewer"
+          "Tor Browser", "Wpa_gui", "veromix", "xtightvncviewer",
+          "Nautilus", "Pavucontrol"
         },
         name    = {
           "Event Tester",
@@ -334,7 +335,10 @@ for i = 0, 9 do
           "pop-up",
         }
       },
-      properties = { floating = true }
+      properties = {
+        floating = true,
+        placement = awful.placement.centered
+      }
     }
 
     ruled.client.append_rule {
