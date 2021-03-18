@@ -218,7 +218,12 @@ local function setup_columns(t)
   end
 end
 
-tag.connect_signal("property::layout", function(t) setup_columns(t) end)
+local cached_layout = {}
+
+tag.connect_signal("property::layout", function(t)
+  if t.layout.name ~= "floating" then  cached_layout[t] = t.layout end
+  setup_columns(t)
+end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
@@ -364,6 +369,7 @@ for i = 0, 9 do
     if awful.tag.selected() ~= nil then
       for _, c in ipairs(awful.tag.selected():clients()) do
         if (c.floating == true and consider_floats == true) then goto skip end
+        if (c.minimized == true and consider_floats == true) then goto skip end
         n = n + 1
         ::skip::
       end
@@ -388,6 +394,18 @@ for i = 0, 9 do
       t.master_width_factor = 0.38
     else
       t.master_width_factor = 0.5
+    end
+
+    if cached_layout[t] ~= nil and t.layout.name == "floating" then
+      awful.layout.set(cached_layout[t])
+
+      for _, c in ipairs(t:clients()) do
+        if c.fullscreen and c.fake_full then
+          c.fullscreen = false
+          local geo = c:geometry()
+          geo.height = geo.height + 1
+        end
+      end
     end
   end
 
@@ -427,7 +445,13 @@ for i = 0, 9 do
     end
   end
 
-  local cached_layout = nil
+  function fake_full_handing(c, orig)
+    local geo = c:geometry()
+    c:geometry({
+      width = geo.width,
+      height = geo.height - 1
+    })
+  end
 
   client.disconnect_signal("request::geometry", awful.ewmh.geometry)
   client.connect_signal("request::geometry", function(c, context, ...)
@@ -435,13 +459,7 @@ for i = 0, 9 do
       awful.ewmh.geometry(c, context, ...)
     else
       if c.fake_full then
-        local geo = c:geometry()
-        c:geometry({
-          width = geo.width,
-          height = geo.height - 1
-        })
-
-        cached_layout = awful.layout.get(awful.screen.focused())
+        fake_full_handing(c)
         awful.layout.set(awful.layout.suit.floating)
       else
         awful.ewmh.geometry(c, context, ...)
@@ -451,9 +469,20 @@ for i = 0, 9 do
 
   client.connect_signal("property::fullscreen", function(c)
     if c.fake_full and not c.fullscreen then
-      if cached_layout ~= nil then awful.layout.set(awful.layout.suit.tile) end
-      cached_layout = nil
+      local t = c.first_tag
+
+      if cached_layout[t] ~= nil then
+        awful.layout.set(cached_layout[t])
+      else
+        awful.layout.set(awful.layout.suit.tile)
+      end
     end
+  end)
+
+  client.connect_signal("property::minimized", function(c)
+    local t = c.first_tag
+    local clients = count_clients(true)
+    reset_mfact(t, clients)
   end)
 
   -- switch to client of other tag
