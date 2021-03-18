@@ -17,13 +17,14 @@ local capi = {
 }
 
 -- ELEMENT STORE
-root.elements = root.elements or {};
+root.elements = root.elements or {}
 
 -- THEME
-beautiful.useless_gap = 4;
+beautiful.useless_gap = 4
 
 -- MODKEY
-modkey = 'Mod4';
+modkey = 'Mod4'
+alt = 'Mod1'
 
 
 -- LAYOUTS
@@ -68,7 +69,8 @@ awful.screen.connect_for_each_screen(function(s) bar_visibility[s.index] = true 
 awful.keyboard.append_global_keybindings({
   awful.key({ modkey }, "Return", function() awful.spawn(config.commands.terminal) end),
   awful.key({ modkey }, "c", function() awful.spawn(config.commands.editor) end),
-  awful.key({ modkey }, "b", function() awful.spawn(config.commands.browser) end),
+  awful.key({ modkey, alt }, "b", function() awful.spawn(config.commands.browser) end),
+  awful.key({ modkey }, "b", function() awful.spawn(config.commands.browser .. " --incognito") end),
   awful.key({ modkey }, "f", function() awful.spawn(config.commands.files) end),
   awful.key({ modkey }, "n", function() awful.spawn(config.commands.nvidia) end),
   awful.key({ modkey }, "space", function() awful.spawn(config.commands.rofi) end),
