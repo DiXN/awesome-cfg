@@ -373,8 +373,10 @@ for i = 0, 9 do
   function count_clients(consider_floats)
     local n = 0
 
-    if awful.tag.selected() ~= nil then
-      for _, c in ipairs(awful.tag.selected():clients()) do
+    local t = awful.screen.focused().selected_tag
+
+    if t ~= nil then
+      for _, c in ipairs(t:clients()) do
         if (c.floating == true or c.minimized == true) and consider_floats == true then goto skip end
         n = n + 1
         ::skip::
@@ -386,8 +388,7 @@ for i = 0, 9 do
 
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
-    c.fake_full = true
-
+    if c.fake_full == nil then c.fake_full = true end
     c:emit_signal("client_change")
   end)
 
@@ -408,7 +409,7 @@ for i = 0, 9 do
     local screen_idx = awful.screen.focused().index
 
     bar_hygenie()
-    local t = awful.tag.selected()
+    local t = awful.screen.focused().selected_tag
     reset_mfact(t, num_clients)
 
     setup_columns(t)
@@ -481,9 +482,11 @@ for i = 0, 9 do
 
   client.connect_signal("property::floating", function(c)
     local num_clients = count_clients(true)
+    local t = c.first_tag
 
-    local t = awful.tag.selected()
-    reset_mfact(t, num_clients)
+    if t ~= nil then
+      reset_mfact(t, num_clients)
+    end
   end)
 
   client.connect_signal("tiled", function(c)
