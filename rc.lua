@@ -319,6 +319,16 @@ for i = 0, 9 do
       }
     }
 
+    ruled.client.append_rule {
+      id = "cs",
+      rule_any = {
+        class = { "csgo_linux64" }
+      },
+      properties = {
+        fake_full = false
+      }
+    }
+
     -- Floating clients.
     ruled.client.append_rule {
       id       = "floating",
