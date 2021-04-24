@@ -322,7 +322,7 @@ for i = 0, 9 do
     ruled.client.append_rule {
       id = "cs",
       rule_any = {
-        class = { "csgo_linux64" }
+        class = { "csgo_linux64", "jellyfinmediaplayer"}
       },
       properties = {
         fake_full = false
@@ -350,6 +350,7 @@ for i = 0, 9 do
         }
       },
       properties = {
+        raise = true,
         floating = true,
         placement = awful.placement.centered
       }
