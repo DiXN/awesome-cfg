@@ -10,6 +10,7 @@ local config = require('helpers.config');
 function toggle_tag_switcher()
   awful.screen.connect_for_each_screen(function(screen)
     screen.tagswitch.visible = not screen.tagswitch.visible;
+    screen.taskpop.visible = not screen.taskpop.visible
   end);
 end
 
@@ -36,6 +37,49 @@ function delete_tag(t)
   switcher.width = ((100+config.global.m) * (#stags+1)) + config.global.m;
   if(#stags == 1) then return end;
   switcher.x = switcher.x + 55;
+end
+
+function popup()
+  local pop = awful.popup {
+    widget = awful.widget.tasklist {
+      screen   = screen[1],
+      filter   = awful.widget.tasklist.filter.currenttags,
+      buttons  = tasklist_buttons,
+      style    = {
+        shape = gears.shape.rounded_rect,
+      },
+      layout   = {
+        spacing = 10,
+        layout = wibox.layout.grid.horizontal
+      },
+      widget_template = {
+        {
+          {
+            id     = 'clienticon',
+            widget = awful.widget.clienticon,
+          },
+          margins = 20,
+          widget  = wibox.container.margin,
+        },
+        id              = 'background_role',
+        forced_width    = 128,
+        forced_height   = 128,
+        bg     = '#ff00ff',
+        widget          = wibox.container.background,
+        create_callback = function(self, c, index, objects) --luacheck: no unused
+          self:get_children_by_id('clienticon')[1].client = c
+        end,
+      },
+    },
+    border_width = 0,
+    ontop        = true,
+    placement    = awful.placement.centered,
+    shape        = gears.shape.rounded_rect,
+    bg     = config.colors.t,
+    visible = false
+  }
+
+  return pop
 end
 
 function make_taglist(s)
@@ -123,6 +167,7 @@ end
 return function()
   awful.screen.connect_for_each_screen(function(screen)
     screen.tagswitch = make_taglist(screen);
+    screen.taskpop = popup()
   end);
 
   awful.keygrabber {
