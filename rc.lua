@@ -8,8 +8,6 @@ local config = require('helpers.config');
 local beautiful = require('beautiful');
 local inspect = require('inspect')
 require('./errors')();
-require('./elements/fake')()
-
 
 local capi = {
   awesome = awesome,
@@ -81,14 +79,6 @@ awful.keyboard.append_global_keybindings({
   -- awful.key({ modkey, "Shift" }, "r", function() if root.elements.powermenu then root.elements.powermenu.lock(awesome.restart) end end),
   awful.key({ modkey, "Shift" }, "r", awesome.restart),
 
-  awful.key({ modkey, "Shift" }, "o",function()
-    local geo = screen[1].geometry
-    local new_width = math.ceil(geo.width/2)
-    local new_width2 = geo.width - new_width
-    screen[1]:fake_resize(geo.x, geo.y, new_width, geo.height)
-    screen.fake_add(geo.x + new_width, geo.y, new_width2, geo.height)
-  end),
-
   awful.key({ modkey, "Shift"}, "b", function()
     local screen_idx = awful.screen.focused().index
 
@@ -127,45 +117,6 @@ awful.keyboard.append_global_keybindings({
   awful.key({ modkey, "Control" }, "Print", function() awful.spawn.with_shell(config.commands.scrotclipsave) end),
   awful.key({ modkey }, "v", function() awful.spawn("quickmenu") end),
 
-  -- Toggle/hide fake screen
-  awful.key({ modkey }, '-',
-    function()
-      fake.toggle_fake()
-    end,
-  { description = 'hide/show fake screen', group = 'fake screen' }),
-
-  -- Create or remove
-  awful.key({ modkey, "Control" }, 'f',
-    function()
-      if not fake.monitor_has_fake() then
-        fake.create_fake()
-        return
-      end
-      fake.remove_fake()
-    end,
-  { description = 'create/remove fake screen on focused', group = 'fake screen' }),
-
-  -- Increase fake screen size
-  awful.key({ modkey, "Control" }, 'Left',
-    function()
-      fake.resize_fake(-resize_amount)
-    end,
-  { description = 'resize fake screen', group = 'fake screen' }),
-
-  -- Decrease fake screen size
-  awful.key({ modkey, "Control" }, 'Right',
-    function()
-      fake.resize_fake(resize_amount)
-    end,
-    { description = 'resize fake screen', group = 'fake screen' }),
-
-  -- Reset screen sizes to initial size
-  awful.key({ modkey, altkey }, 'r',
-    function()
-      fake.reset_fake()
-    end,
-    { description = 'reset fake screen size', group = 'fake screen' }),
-
   awful.key {
     modifiers = { modkey, "Shift" },
     keygroup    = "numrow",
@@ -180,8 +131,6 @@ awful.keyboard.append_global_keybindings({
       end
     end,
   },
-
-	--awful.key({}, "space", function () if root.elements.powermenu.prompt then prompt() end end),
 
   awful.key({}, "XF86AudioRaiseVolume", function ()
       awful.util.spawn(config.commands.volup) end),
@@ -353,6 +302,20 @@ for i = 0, 9 do
         raise = true,
         floating = true,
         placement = awful.placement.centered
+      }
+    }
+
+    ruled.client.append_rule {
+      id       = "mpv",
+      rule_any = {
+        class    = {
+          "mpv"
+        },
+      },
+      properties = {
+        raise = true,
+        fake_full = false,
+        fullscreen = true,
       }
     }
 
