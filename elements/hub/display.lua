@@ -22,7 +22,7 @@ function make_mon(wall, id)
     forced_width = mon_size.w,
     forced_height = mon_size.h,
     fg = config.colors.w,
-  } 
+  }
   monitor:set_image(gears.surface.load_uncached(gears.filesystem.get_configuration_dir()..wall));
   return wibox.widget {
     layout = wibox.layout.stack,
@@ -79,6 +79,32 @@ return function()
     end)
   ));
 
+  local layout_button = function(text, callback)
+    local add = wibox.container.margin()
+    add.margins = 10
+    add:buttons(gears.table.join(
+      awful.button({}, 1, callback)
+    ))
+
+    add:setup {
+      layout = wibox.container.background,
+      forced_height = 100,
+      forced_width = 50,
+      bg = config.colors.f,
+      fg = config.colors.w,
+      shape = rounded(),
+      {
+        widget = wibox.widget.textbox,
+        text = text,
+        font = config.fonts.t.." Bold 15",
+        align = 'center',
+        valign = 'center',
+      }
+    }
+
+    return add
+  end
+
   local brightness = wibox.widget.slider();
   brightness.bar_shape = function(c,w,h) gears.shape.rounded_rect(c,w,h,config.global.slider/2) end;
   brightness.bar_height = config.global.slider;
@@ -120,7 +146,7 @@ return function()
     margins = config.global.m,
     layout
   }
-  
+
   view:setup {
     layout = wibox.container.background,
     fg = config.colors.xf,
@@ -163,6 +189,37 @@ return function()
           }
         },
         { layout = wibox.container.margin, top = config.global.m, monitors }, changewall,
+        {
+          layout = wibox.layout.fixed.vertical,
+          {
+            layout = wibox.container.background,
+            bg = config.colors.f,
+            shape = rounded(),
+            forced_height = (config.global.m*14) + config.global.slider,
+            {
+              layout = wibox.layout.fixed.vertical,
+              {
+                layout = wibox.container.margin,
+                margins = config.global.m,
+                {
+                  font = config.fonts.tlb,
+                  text = "Layouts",
+                  widget = wibox.widget.textbox,
+                }
+              },
+              {
+                layout = wibox.layout.flex.horizontal,
+                layout_button("idle", function() awful.spawn(config.commands.idle) end),
+                layout_button("full", function()
+                  screen.disconnect_signal("added", function() end)
+                  awful.spawn(config.commands.full)
+                end),
+                layout_button("snd", function() awful.spawn.with_shell(config.commands.secondary) end),
+                layout_button("s&t", function() awful.spawn.with_shell(config.commands.secondthird) end)
+              }
+            }
+          },
+        }
       },
       nil
     }
