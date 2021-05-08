@@ -251,6 +251,20 @@ function make_powermenu()
   avatar.forced_width = config.powermenu.a;
   avatar.forced_height = config.powermenu.a;
   avatar:set_clip_shape(function(c) return gears.shape.circle(c,config.powermenu.a,config.powermenu.a) end);
+  avatar:buttons(gears.table.join(awful.button({}, 1, function() awesome.restart() end)));
+
+  avatar:connect_signal("mouse::enter", function()
+    local off = 5
+    avatar.forced_width = config.powermenu.a + off;
+    avatar.forced_height = config.powermenu.a + off;
+    avatar:set_clip_shape(function(c) return gears.shape.circle(c,config.powermenu.a + off,config.powermenu.a + off) end);
+  end)
+
+  avatar:connect_signal("mouse::leave", function()
+    avatar.forced_width = config.powermenu.a;
+    avatar.forced_height = config.powermenu.a;
+    avatar:set_clip_shape(function(c) return gears.shape.circle(c,config.powermenu.a,config.powermenu.a) end);
+  end)
 
   local user = wibox.widget.textbox();
   user.font = config.fonts.tlb;
