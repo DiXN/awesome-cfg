@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
-MONITOR_NAMES=($(xrandr --listmonitors | grep '^\s' | awk '{print $4}'))
-MONITOR_BRIGHTNESSES=($(xrandr --verbose | grep Brightness | grep -o '[0-9].*'))
+set -x
+MONITOR_NAMES=($(xrandr --verbose | awk '/connected.*[0-9]+x[0-9]+/{print $1}'| head))
+MONITOR_BRIGHTNESSES=($(xrandr --verbose | awk '/Brightness/ { print $2 }'))
 
 for i in "${!MONITOR_NAMES[@]}"; do
   if [ "$1" == "${MONITOR_NAMES[i]}" ]; then
