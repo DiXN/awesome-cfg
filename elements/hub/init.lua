@@ -18,7 +18,7 @@ function close_views()
 end
 
 function enable_view_by_index(i, s, loc)
-  if root.elements.hub_views[i] then 
+  if root.elements.hub_views[i] then
     close_views();
     root.elements.hub_views[i].view.visible = true;
     root.elements.hub_views[i].title.font = config.fonts.tlb;
@@ -31,7 +31,7 @@ function enable_view_by_index(i, s, loc)
     end
     root.elements.hub.visible = true;
   end
-end 
+end
 
 function make_view(i, t, v, a)
   local button = wibox.container.background();
@@ -168,7 +168,7 @@ function make_nav()
     }
   };
   power:buttons(gears.table.join(
-    awful.button({}, 1, function() 
+    awful.button({}, 1, function()
       if root.elements.powermenu.show then root.elements.powermenu.show() end
     end)
   ));
@@ -204,11 +204,11 @@ return function()
   local nav = make_nav();
   local view_container = wibox.layout.stack();
   gears.table.map(function(v) view_container:add(v.view) end, root.elements.hub_views);
-  
+
   hub:buttons(gears.table.join(
     awful.button({ }, 3, function() hub.visible = false end)
   ));
-  
+
   hub.y = config.topbar.h + (config.global.m*2);
   hub:setup {
     layout = wibox.layout.flex.vertical,
@@ -218,12 +218,12 @@ return function()
       view_container,
     }
   };
-  
+
   hub.close = function() hub.visible = false end;
   hub.enable_view_by_index = enable_view_by_index;
   hub.close_views = close_views;
   hub.make_view = make_view;
-  
+
   close_views();
   root.elements.hub = hub;
 end

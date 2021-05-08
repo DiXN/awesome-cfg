@@ -69,7 +69,6 @@ function lock(cb)
   -- Hide other elements on the screen
   if root.elements.topbar then root.elements.topbar.hide() end;
   if root.elements.hub then root.elements.hub.visible = false end;
-  for s in screen do if s.selected_tag then s.selected_tag.selected = false end end;
 
   -- Set the callback to be called when unlocking
   if cb then root.elements.powermenu.lockcallback = cb end;
@@ -110,7 +109,6 @@ function lock(cb)
 
 end
 
-activator = awful.key({}, "space", function () if root.elements.powermenu.prompt then prompt() end end);
 
 function show()
   if root.elements.powermenu.open then return end;
@@ -127,7 +125,6 @@ function show()
   -- Hide other elements on the screen
   if root.elements.topbar then root.elements.topbar.hide() end;
   if root.elements.hub then root.elements.hub.visible = false end;
-  for s in screen do if s.selected_tag then s.selected_tag.selected = false end end;
 
   -- Show other icons in powermenu
     -- Hide other icons in powermenu
@@ -165,7 +162,6 @@ end
 
 function hide()
   for s in screen do
-    s.tags[1].selected = true;
     root.elements.powermenu.splash[s.index].widget:reset();
     root.elements.powermenu.splash[s.index].visible = false;
   end;
