@@ -190,17 +190,17 @@ for i = 0, 9 do
         focus     = awful.client.focus.filter,
         raise     = true,
         screen    = awful.screen.preferred,
-        placement = awful.placement.no_overlap+awful.placement.no_offscreen
+        placement = awful.placement.no_overlap+awful.placement.no_offscreen,
+        fake_full = false
       }
     }
 
     ruled.client.append_rule {
-      id = "cs",
       rule_any = {
-        class = { "csgo_linux64", "jellyfinmediaplayer"}
+        class = { "brave-browser", "Brave-browser" }
       },
       properties = {
-        fake_full = false
+        fake_full = true
       }
     }
 
@@ -232,7 +232,6 @@ for i = 0, 9 do
     }
 
     ruled.client.append_rule {
-      id       = "mpv",
       rule_any = {
         class    = {
           "mpv"
@@ -240,7 +239,6 @@ for i = 0, 9 do
       },
       properties = {
         raise = true,
-        fake_full = false,
         fullscreen = true,
       }
     }
@@ -278,7 +276,6 @@ for i = 0, 9 do
 
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
-    if c.fake_full == nil then c.fake_full = true end
     c:emit_signal("client_change")
   end)
 
