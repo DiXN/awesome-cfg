@@ -102,6 +102,9 @@ return function()
       }
     }
 
+    add:connect_signal("mouse::enter", function() add.bg = config.colors.w end);
+    add:connect_signal("mouse::leave", function() add.bg = config.colors.f end);
+
     return add
   end
 
@@ -209,10 +212,11 @@ return function()
               },
               {
                 layout = wibox.layout.flex.horizontal,
-                layout_button("idle", function() awful.spawn(config.commands.idle) end),
+                layout_button("idle", function()
+                  awful.spawn(gears.filesystem.get_xdg_config_home() .. 'instantos/quickmenu/idle')
+                end),
                 layout_button("full", function()
-                  screen.disconnect_signal("added", function() end)
-                  awful.spawn(config.commands.full)
+                  awful.spawn(gears.filesystem.get_xdg_config_home() .. 'instantos/quickmenu/full')
                 end),
                 layout_button("snd", function() awful.spawn.with_shell(config.commands.secondary) end),
                 layout_button("s&t", function() awful.spawn.with_shell(config.commands.secondthird) end)

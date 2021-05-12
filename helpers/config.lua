@@ -187,8 +187,6 @@ local config = {
     audiosrc = "pamixer --list-sinks | awk -F\\\" '{print $4}'",
     micsrc = "pamixer --list-sources | grep $(pacmd list-sources | grep '*' | awk '{print $3}' ) | awk -F\\\" '{print $4}'",
     batcmd = 'bash -c "acpi -V | grep -m 1 \'Battery 1\' | awk -F, \'{print $2}\' | sed \'s/%//\'"',
-    full = gears.filesystem.get_xdg_config_home()..'instantos/quickmenu/full',
-    idle = gears.filesystem.get_xdg_config_home()..'instantos/quickmenu/idle',
     secondary = 'xrandr --output HDMI-0 --mode 2560x1440 --right-of DP-4 --output DP-4 --off',
     secondthird = 'xrandr --output HDMI-0 --mode 2560x1440 --right-of DP-4 && xrandr --output DP-3 --mode 1360x768 --right-of HDMI-0 && xrandr --output DP-4 --off'
   },
