@@ -99,11 +99,12 @@ return function()
         font = config.fonts.t.." Bold 15",
         align = 'center',
         valign = 'center',
-      }
+      },
+      id = "bg"
     }
 
-    add:connect_signal("mouse::enter", function() add.bg = config.colors.w end);
-    add:connect_signal("mouse::leave", function() add.bg = config.colors.f end);
+    add:connect_signal("mouse::enter", function(el) el:get_children_by_id("bg")[1].bg = config.colors.xf end);
+    add:connect_signal("mouse::leave", function(el) el:get_children_by_id("bg")[1].bg = config.colors.f end);
 
     return add
   end
