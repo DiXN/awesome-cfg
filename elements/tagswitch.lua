@@ -39,10 +39,11 @@ function delete_tag(t)
   switcher.x = switcher.x + 55;
 end
 
-function popup()
+function popup(s)
   local pop = awful.popup {
+    screen = s,
     widget = awful.widget.tasklist {
-      screen   = screen[1],
+      screen   = s,
       filter   = awful.widget.tasklist.filter.currenttags,
       buttons  = tasklist_buttons,
       style    = {
@@ -167,7 +168,7 @@ end
 return function()
   awful.screen.connect_for_each_screen(function(screen)
     screen.tagswitch = make_taglist(screen);
-    screen.taskpop = popup()
+    screen.taskpop = popup(screen)
   end);
 
   awful.keygrabber {
