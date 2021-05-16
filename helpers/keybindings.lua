@@ -6,6 +6,25 @@ local gears = require('gears');
 modkey = 'Mod4'
 alt = 'Mod1'
 
+local vol_timer = nil
+
+local function init_vol_timer()
+  vol_timer = gears.timer {
+    timeout   = 2,
+    autostart = true,
+    single_shot  = true,
+    callback  = function()
+      root.elements.hub.close()
+    end
+  }
+end
+
+local function vol()
+  root.elements.hub_views[6].view.refresh()
+  root.elements.hub.enable_view_by_index(6, mouse.screen)
+  if vol_timer ~= nil then vol_timer:again() else init_vol_timer() end
+end
+
 --GLOBAL KEYBINDS/BUTTONS
 local key_bindings = gears.table.join({
   awful.key({ modkey }, "Return", function() awful.spawn(config.commands.terminal) end),
@@ -75,13 +94,16 @@ local key_bindings = gears.table.join({
   },
 
   awful.key({}, "XF86AudioRaiseVolume", function ()
-      awful.util.spawn(config.commands.volup) end),
+    awful.spawn.easy_async(config.commands.volup, vol);
+  end),
   awful.key({}, "XF86AudioLowerVolume", function()
-      awful.util.spawn(config.commands.voldown) end),
+    awful.spawn.easy_async(config.commands.voldown, vol);
+  end),
+
   awful.key({}, "XF86AudioMute", function()
       awful.util.spawn(config.commands.mute) end),
-  awful.key({modkey, "Shift", "Control"}, "d", function() awful.util.spawn(config.commands.voldown) end),
-  awful.key({modkey, "Shift", "Control"}, "u", function() awful.util.spawn(config.commands.volup) end),
+  awful.key({modkey, "Shift", "Control"}, "d", function() awful.spawn.easy_async(config.commands.voldown, vol) end),
+  awful.key({modkey, "Shift", "Control"}, "u", function() awful.spawn.easy_async(config.commands.volup, vol) end),
 })
 
 return key_bindings

@@ -53,14 +53,6 @@ return function()
     vol_heading.markup = 'Volume: <span font="'..config.fonts.tll..'">'..vol_slider.value..'</span>';
   end);
 
-  view:connect_signal('mouse::enter', function()
-    awful.spawn.easy_async_with_shell(config.commands.vol, function(o)
-      vol_slider:set_value(tonumber(o));
-    end);
-
-    mute_handling()
-  end);
-
   local mute = wibox.widget.textbox();
   mute.font = config.fonts.tlb;
 
