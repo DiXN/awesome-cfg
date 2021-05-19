@@ -154,34 +154,29 @@ return function()
   };
 
   awful.spawn.easy_async_with_shell(config.commands.song, function(o)
-    spotify_title.text = o:gsub("^%s*(.-)%s*$", "%1");
+    spotify_title.text = o
   end);
 
   awful.spawn.easy_async_with_shell(config.commands.artist, function(o)
-    spotify_message.text = o:gsub("^%s*(.-)%s*$", "%1");
+    spotify_message.text = o
   end);
 
   awful.widget.watch(config.commands.spotify_state, 1, function(w,o,e,r,c)
-    local cmdstate = {}
+    cmdstate = {}
     o:gsub("[^\r\n]+", function(m) table.insert(cmdstate, m) end);
-    local i = gears.table.find_first_key(naughty.active, function(k,v) return v.app_name == 'Spotify' end);
-    local spotify_state = naughty.active[i];
-
-    if spotify_state then saved_spotify_state = spotify_state end;
-    if not spotify_state and saved_spotify_state then spotify_state = saved_spotify_state end;
 
     play.text = (cmdstate[1] == 'not playing') and config.icons.play or config.icons.pause;
 
-    if spotify_state and spotify_title.text ~= spotify_state.title then
-      album_icon:set_image(gears.surface.load_silently(spotify_state.icon));
+    if cmdstate[2] ~= 'Nothing Playing' then
+      album_icon:set_image(gears.surface.load_uncached_silently("/tmp/spot/album.png"));
       spotify.first = album_icon;
-      spotify_title.text = spotify_state.title;
-      spotify_message.text = spotify_state.message;
-    elseif not spotify_state then
+      spotify_title.text = cmdstate[2];
+      spotify_message.text = cmdstate[3];
+    else
       spotify.first = spotify_icon;
       spotify_title.text = cmdstate[2] or 'Nothing Playing';
       spotify_message.text = cmdstate[3] or '';
-    end;
+    end
   end);
 
   function mute_handling()
