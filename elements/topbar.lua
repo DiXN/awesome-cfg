@@ -454,7 +454,9 @@ function make_tasklist(s)
         id     = 'background_role',
         widget = wibox.container.background,
       },
-    }
+      id = 'tasklist_internal'
+    },
+    id = 'tasklist_base'
   }
 
   root.elements.tasklist = root.elements.tasklist or {};
