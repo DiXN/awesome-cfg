@@ -153,30 +153,21 @@ return function()
     }
   };
 
-  awful.spawn.easy_async_with_shell(config.commands.song, function(o)
-    spotify_title.text = o
-  end);
-
-  awful.spawn.easy_async_with_shell(config.commands.artist, function(o)
-    spotify_message.text = o
-  end);
-
   awful.widget.watch(config.commands.spotify_state, 1, function(w,o,e,r,c)
     cmdstate = {}
     o:gsub("[^\r\n]+", function(m) table.insert(cmdstate, m) end);
 
     play.text = (cmdstate[1] == 'not playing') and config.icons.play or config.icons.pause;
 
-    if cmdstate[2] ~= 'Nothing Playing' then
+    if gears.filesystem.file_readable("/tmp/spot/album.png") then
       album_icon:set_image(gears.surface.load_uncached_silently("/tmp/spot/album.png"));
       spotify.first = album_icon;
-      spotify_title.text = cmdstate[2];
-      spotify_message.text = cmdstate[3];
     else
-      spotify.first = spotify_icon;
-      spotify_title.text = cmdstate[2] or 'Nothing Playing';
-      spotify_message.text = cmdstate[3] or '';
+      spotify.first = icon
     end
+
+    spotify_title.text = cmdstate[2];
+    spotify_message.text = cmdstate[3];
   end);
 
   function mute_handling()
