@@ -14,14 +14,27 @@ local function init_vol_timer()
     autostart = true,
     single_shot  = true,
     callback  = function()
+      local media_view = root.elements.hub_views[6]
+      media_view.view.title.visible = true
+      media_view.view.close.visible = true
+      root.elements.hub.nav.visible = true
+      root.elements.hub.width = config.hub.w
+      root.elements.hub.height = config.hub.h
       root.elements.hub.close()
     end
   }
 end
 
+
 local function vol()
-  root.elements.hub_views[6].view.refresh()
-  root.elements.hub.enable_view_by_index(6, mouse.screen)
+  local media_view = root.elements.hub_views[6]
+  media_view.view.refresh()
+  media_view.view.title.visible = false
+  media_view.view.close.visible = false
+  root.elements.hub.nav.visible = false
+  root.elements.hub.width = config.hub.w - config.hub.nw
+  root.elements.hub.height = 397
+  root.elements.hub.enable_view_by_index(6, mouse.screen, 'vol')
   if vol_timer ~= nil then vol_timer:again() else init_vol_timer() end
 end
 

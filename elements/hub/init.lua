@@ -20,15 +20,22 @@ end
 function enable_view_by_index(i, s, loc)
   if root.elements.hub_views[i] then
     close_views();
+
     root.elements.hub_views[i].view.visible = true;
     root.elements.hub_views[i].title.font = config.fonts.tlb;
+
     if root.elements.hub_views[i].view.refresh then root.elements.hub_views[i].view.refresh() end
+
     if not s then return end
+
     if loc == 'right' then
       root.elements.hub.x = (s.workarea.width - config.hub.w - config.global.m) + s.workarea.x;
+    elseif loc == 'vol' then
+      root.elements.hub.x = (s.workarea.width - config.hub.w + config.hub.nw - config.global.m) + s.workarea.x;
     else
       root.elements.hub.x = ((s.workarea.width / 2) - (config.hub.w/2)) + s.workarea.x;
     end
+
     root.elements.hub.visible = true;
   end
 end
@@ -67,6 +74,7 @@ function make_view(i, t, v, a)
 
   button:connect_signal("mouse::enter", function() button.bg = config.colors.f end);
   button:connect_signal("mouse::leave", function() button.bg = config.colors.t end);
+
   button:buttons(gears.table.join(
     awful.button({ }, 1, function()
       close_views();
@@ -223,6 +231,7 @@ return function()
   hub.enable_view_by_index = enable_view_by_index;
   hub.close_views = close_views;
   hub.make_view = make_view;
+  hub.nav = nav
 
   close_views();
   root.elements.hub = hub;

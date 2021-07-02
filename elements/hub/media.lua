@@ -17,6 +17,7 @@ return function()
   local title = wibox.widget.textbox("Media");
   title.font = config.fonts.tlb;
   title.forced_height = config.hub.i + config.global.m + config.global.m;
+  view.title = title
 
   local close = wibox.widget.textbox(config.icons.close);
   close.font = config.fonts.il;
@@ -24,6 +25,7 @@ return function()
   close:buttons(gears.table.join(
     awful.button({}, 1, function() if root.elements.hub then root.elements.hub.close() end end)
   ));
+  view.close = close
 
   local vol_heading = wibox.widget.textbox('Volume');
   vol_heading.font = config.fonts.tlb;
