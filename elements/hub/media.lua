@@ -90,11 +90,6 @@ return function()
   local play = wibox.widget.textbox();
   play.font = config.fonts.txxlb;
   play.text = config.icons.play;
-  play:buttons(gears.table.join(
-    awful.button({}, 1, function()
-      awful.spawn.with_shell(config.commands.play);
-    end)
-  ));
   play:connect_signal('mouse::enter', function()
     play.markup = '<span foreground="'..config.colors.x4..'">'..play.text..'</span>';
   end);
@@ -104,11 +99,6 @@ return function()
 
   local next = wibox.widget.textbox(config.icons.next);
   next.font = config.fonts.txxlb;
-  next:buttons(gears.table.join(
-    awful.button({}, 1, function()
-      awful.spawn.with_shell(config.commands.next);
-    end)
-  ));
   next:connect_signal('mouse::enter', function()
     next.markup = '<span foreground="'..config.colors.x4..'">'..next.text..'</span>';
   end);
@@ -118,11 +108,6 @@ return function()
 
   local prev = wibox.widget.textbox(config.icons.prev);
   prev.font = config.fonts.txxlb;
-  prev:buttons(gears.table.join(
-    awful.button({}, 1, function()
-      awful.spawn.with_shell(config.commands.prev);
-    end)
-  ));
   prev:connect_signal('mouse::enter', function()
     prev.markup = '<span foreground="'..config.colors.x4..'">'..prev.text..'</span>';
   end);
@@ -153,7 +138,7 @@ return function()
     }
   };
 
-  awful.widget.watch(config.commands.spotify_state, 1, function(w,o,e,r,c)
+  local media_watch = awful.widget.watch(config.commands.spotify_state, 1, function(w,o,e,r,c)
     cmdstate = {}
     o:gsub("[^\r\n]+", function(m) table.insert(cmdstate, m) end);
 
@@ -169,6 +154,27 @@ return function()
     spotify_title.text = cmdstate[2];
     spotify_message.text = cmdstate[3];
   end);
+
+  play:buttons(gears.table.join(
+    awful.button({}, 1, function()
+      media_watch:emit_signal('timeout')
+      awful.spawn.with_shell(config.commands.play);
+    end)
+  ));
+
+  next:buttons(gears.table.join(
+    awful.button({}, 1, function()
+      media_watch:emit_signal('timeout')
+      awful.spawn.with_shell(config.commands.next);
+    end)
+  ));
+
+  prev:buttons(gears.table.join(
+    awful.button({}, 1, function()
+      media_watch:emit_signal('timeout')
+      awful.spawn.with_shell(config.commands.prev);
+    end)
+  ));
 
   function mute_handling()
     awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
@@ -198,6 +204,8 @@ return function()
     awful.spawn.easy_async_with_shell(config.commands.vol, function(o)
       vol_slider:set_value(tonumber(o));
     end);
+
+    media_watch:emit_signal('timeout')
 
     mute_handling()
   end
