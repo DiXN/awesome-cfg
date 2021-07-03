@@ -34,10 +34,6 @@ return function()
   vol_footer.font = config.fonts.tsl;
   vol_footer.align = 'right';
 
-  local mic_footer = wibox.widget.textbox('test');
-  mic_footer.font = config.fonts.tsl;
-  mic_footer.align = 'right';
-
   local vol_slider = wibox.widget.slider();
   vol_slider.bar_shape = function(c,w,h) gears.shape.rounded_rect(c,w,h,config.global.slider/2) end;
   vol_slider.bar_height = config.global.slider;
@@ -197,10 +193,6 @@ return function()
 
     awful.spawn.easy_async_with_shell(config.commands.audiosrc, function(o)
       if o then vol_footer.markup = 'Output: <span font="'..config.fonts.tsb..'">'..o:gsub("^%s*(.-)%s*$", "%1")..'</span>' end;
-    end);
-
-    awful.spawn.easy_async_with_shell(config.commands.micsrc, function(o,e)
-      if o then mic_footer.markup = 'Input: <span font="'..config.fonts.tsb..'">'..o:gsub("^%s*(.-)%s*$", "%1")..'</span>' end;
     end);
 
     awful.spawn.easy_async_with_shell(config.commands.vol, function(o)
