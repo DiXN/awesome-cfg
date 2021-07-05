@@ -215,8 +215,17 @@ function make_tray(s)
 
     tray.width = width
     tray:struts({ top = config.topbar.h + config.global.m });
-    tray.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x) - config.topbar.dw - 10 - tray.width - 40;
+
+    tray.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x)
+      - config.topbar.dw - 10 - tray.width - 40;
+
     tray.y = config.global.m;
+
+    -- Update tasklist_r width
+    local width_r = (s.workarea.width / 2) - 310
+      - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) - num_entries * 32;
+
+    root.elements.tasklist[s.index][2].width = width_r
   end)
 
   root.elements.tray = root.elements.tray or {};
@@ -328,7 +337,6 @@ function make_utilities(s)
   root.elements.utilities[s.index] = utilities;
 end
 
-
 function make_taglist(s)
   local taglist = wibox({
     screen = s,
@@ -367,6 +375,50 @@ function make_taglist(s)
   root.elements.taglist[s.index] = taglist;
 end
 
+local function filter_internals(c, s, condition)
+  scr = s
+  -- Only print client on the same screen as this widget
+  if c.screen ~= scr then return false end
+
+  local tags = scr.tags
+  for _, t in ipairs(tags) do
+    if t.selected then
+      local ctags = c:tags()
+      local tag_clients = t:clients()
+
+      local tags_div = math.floor(#tag_clients / 2)
+      local l_clients = #tag_clients - tags_div
+
+      for _, v in ipairs(ctags) do
+        if v == t then
+          for i, tag_c in ipairs(tag_clients) do
+            if tag_c == c and condition(i, l_clients) then
+              return true
+            end
+          end
+        else
+          return false
+        end
+      end
+    end
+  end
+
+  return false
+end
+
+function awful.widget.tasklist.filter.client_filter_l(c, s)
+  return filter_internals(c, s, function(i, l_clients)
+    return i <= l_clients
+  end)
+end
+
+
+function awful.widget.tasklist.filter.client_filter_r(c, s)
+  return filter_internals(c, s, function(i, l_clients)
+    return i > l_clients
+  end)
+end
+
 function make_tasklist(s)
   local tasklist_buttons = gears.table.join(
     awful.button({ }, 1, function (c)
@@ -379,9 +431,6 @@ function make_tasklist(s)
         {raise = true}
       )
     end
-    end),
-    awful.button({ }, 3, function()
-      awful.menu.client_list({ theme = { width = 250 } })
     end),
     awful.button({ }, 4, function ()
       awful.client.focus.byidx(1)
@@ -405,17 +454,62 @@ function make_tasklist(s)
     font = config.fonts.ttl
   });
 
+  -- Create layoutbox already to get offset
+  make_layoutbox(s)
+
+  local width_r = (s.workarea.width / 2) - 310 - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x);
+
+  local tasklist_r = wibox({
+    screen = s,
+    visible = false,
+    type = "utility",
+    bg = config.colors.t,
+    fg = config.colors.xf,
+    width = width_r,
+    height = config.topbar.h,
+    font = config.fonts.ttl
+  });
+
   -- tasklist:connect_signal("mouse::leave", function(t) t.visible = false end)
 
   tasklist:struts({ top = config.topbar.h + config.global.m });
   tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 12;
   tasklist.y = config.global.m;
 
+  tasklist_r:struts({ top = config.topbar.h + config.global.m });
+  tasklist_r.x = s.workarea.x + (s.workarea.width / 2) + (config.topbar.dw) - config.topbar.w * 2 - config.global.m;
+  tasklist_r.y = config.global.m;
+
   beautiful.tasklist_bg_normal = config.colors.w .. '60';
   beautiful.tasklist_fg_normal = config.colors.b;
   beautiful.tasklist_bg_minimize = config.colors.b ..'90';
   beautiful.tasklist_fg_minimize = config.colors.w;
   beautiful.tasklist_font = config.fonts.tll;
+
+  local tasklist_widget_tempate = {
+    {
+      {
+        {
+          {
+            id     = 'icon_role',
+            widget = wibox.widget.imagebox,
+          },
+          margins = 5,
+          widget  = wibox.container.margin,
+        },
+        {
+          id     = 'text_role',
+          widget = wibox.widget.textbox,
+        },
+        layout = wibox.layout.fixed.horizontal,
+      },
+      left  = 5,
+      right = 5,
+      widget = wibox.container.margin
+    },
+    id     = 'background_role',
+    widget = wibox.container.background,
+  }
 
   tasklist:setup {
     layout = wibox.container.place,
@@ -424,43 +518,41 @@ function make_tasklist(s)
     width = width,
     awful.widget.tasklist {
       screen  = s,
-      filter  = awful.widget.tasklist.filter.currenttags,
+      filter  = awful.widget.tasklist.filter.client_filter_l,
       buttons = tasklist_buttons,
       layout = {
         spacing = 10,
         layout  = wibox.layout.flex.horizontal
       },
-      widget_template = {
-        {
-          {
-            {
-              {
-                id     = 'icon_role',
-                widget = wibox.widget.imagebox,
-              },
-              margins = 5,
-              widget  = wibox.container.margin,
-            },
-            {
-              id     = 'text_role',
-              widget = wibox.widget.textbox,
-            },
-            layout = wibox.layout.fixed.horizontal,
-          },
-          left  = 5,
-          right = 5,
-          widget = wibox.container.margin
-        },
-        id     = 'background_role',
-        widget = wibox.container.background,
+      widget_template = tasklist_widget_tempate,
+      id = 'tasklist_internal'
+    },
+    id = 'tasklist_base'
+  }
+
+  tasklist_r:setup {
+    layout = wibox.container.place,
+    halign = 'left',
+    content_fill_horizontal = true,
+    width = width,
+    awful.widget.tasklist {
+      screen  = s,
+      filter  = awful.widget.tasklist.filter.client_filter_r,
+      buttons = tasklist_buttons,
+      layout = {
+        spacing = 10,
+        layout  = wibox.layout.flex.horizontal
       },
+      widget_template = tasklist_widget_tempate,
       id = 'tasklist_internal'
     },
     id = 'tasklist_base'
   }
 
   root.elements.tasklist = root.elements.tasklist or {};
-  root.elements.tasklist[s.index] = tasklist;
+  root.elements.tasklist[s.index] = {}
+  root.elements.tasklist[s.index][1] = tasklist;
+  root.elements.tasklist[s.index][2] = tasklist_r;
 end
 
 function get_tasklist()
@@ -519,6 +611,8 @@ function show(idx)
   for i in pairs(root.elements.utilities) do root.elements.utilities[idx or i].visible = true end;
   for i in pairs(root.elements.launcher) do root.elements.launcher[idx or i].visible = true end;
   for i in pairs(root.elements.taglist) do root.elements.taglist[idx or i].visible = true end;
+  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i][1].visible = true end;
+  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i][2].visible = true end;
   for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = true end;
   for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = true end end;
   for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = true end;
@@ -529,7 +623,8 @@ function hide(idx)
   for i in pairs(root.elements.utilities) do root.elements.utilities[idx or i].visible = false end;
   for i in pairs(root.elements.launcher) do root.elements.launcher[idx or i].visible = false end;
   for i in pairs(root.elements.taglist) do root.elements.taglist[idx or i].visible = false end;
-  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i].visible = false end;
+  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i][1].visible = false end;
+  for i in pairs(root.elements.tasklist) do root.elements.tasklist[idx or i][2].visible = false end;
   for i in pairs(root.elements.power) do root.elements.power[idx or i].visible = false end;
   for i in pairs(root.elements.tray) do if root.elements.tray[idx or i] then root.elements.tray[idx or i].visible = false end end;
   for i in pairs(root.elements.date) do root.elements.date[idx or i].visible = false end;
@@ -539,9 +634,8 @@ end
 return function()
   setup_bar()
 
-  screen.connect_signal("added", function(scr)
-    awesome.restart()
-  end)
+  screen.connect_signal("added", function(scr) awesome.restart() end)
+
   root.elements.topbar.tasklist = get_tasklist;
   root.elements.topbar.show = show;
   root.elements.topbar.hide = hide;
