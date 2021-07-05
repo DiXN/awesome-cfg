@@ -33,7 +33,7 @@ local function vol()
   media_view.view.close.visible = false
   root.elements.hub.nav.visible = false
   root.elements.hub.width = config.hub.w - config.hub.nw
-  root.elements.hub.height = 397
+  root.elements.hub.height = 380
   root.elements.hub.enable_view_by_index(6, mouse.screen, 'vol')
   if vol_timer ~= nil then vol_timer:again() else init_vol_timer() end
 end
