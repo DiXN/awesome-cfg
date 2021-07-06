@@ -83,13 +83,20 @@ awful.keygrabber {
   export_keybindings = true,
 }
 
-local function setup_columns(t)
-  if t.col_count == nil then t.col_count = 2 end
+local function is_ultra_wide()
+  local s = mouse.screen
+  return (s.workarea.width - s.workarea.x) / s.geometry.height > 1.7777777777777777
+end
 
-  if t.layout.name == "tile" and t.col_count < 3 then
-    awful.tag.incncol(1, t)
-    t.master_width_factor = 0.38
-    t.col_count = 3
+local function setup_columns(t)
+  if is_ultra_wide() then
+    if t.col_count == nil then t.col_count = 2 end
+
+    if t.layout.name == "tile" and t.col_count < 3 then
+      awful.tag.incncol(1, t)
+      t.master_width_factor = 0.38
+      t.col_count = 3
+    end
   end
 end
 
@@ -284,7 +291,7 @@ for i = 0, 9 do
   end)
 
   local function reset_mfact(t, num_clients)
-    if num_clients > 2 then
+    if is_ultra_wide() and num_clients > 2 then
       t.master_width_factor = 0.38
     else
       t.master_width_factor = 0.5
