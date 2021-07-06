@@ -274,7 +274,8 @@ return function()
           margins = config.global.m,
           spotify
         }
-      }
+      },
+      id ="view_background_role"
     }
   }
 

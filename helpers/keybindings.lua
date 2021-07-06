@@ -15,11 +15,17 @@ local function init_vol_timer()
     single_shot  = true,
     callback  = function()
       local media_view = root.elements.hub_views[6]
+      media_view.view.left = config.global.m
+      media_view.view.right = config.global.m
+
+      media_view.view:get_children_by_id("view_background_role")[1].spacing = config.global.m
+
       media_view.view.title.visible = true
       media_view.view.close.visible = true
       root.elements.hub.nav.visible = true
       root.elements.hub.width = config.hub.w
       root.elements.hub.height = config.hub.h
+      root.elements.hub.bg = config.colors.f
       root.elements.hub.close()
     end
   }
@@ -29,11 +35,17 @@ end
 local function vol()
   local media_view = root.elements.hub_views[6]
   media_view.view.refresh()
+  media_view.view.left = 0
+  media_view.view.right = 0
+
+  media_view.view:get_children_by_id("view_background_role")[1].spacing = 4
+
   media_view.view.title.visible = false
   media_view.view.close.visible = false
   root.elements.hub.nav.visible = false
   root.elements.hub.width = config.hub.w - config.hub.nw
-  root.elements.hub.height = 380
+  root.elements.hub.height = 357
+  root.elements.hub.bg = config.colors.t
   root.elements.hub.enable_view_by_index(6, mouse.screen, 'vol')
   if vol_timer ~= nil then vol_timer:again() else init_vol_timer() end
 end
