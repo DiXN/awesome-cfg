@@ -168,6 +168,9 @@ function make_layoutbox(s)
   root.elements.layout[s.index] = layout;
 end
 
+-- Scale task list width/spaces form the ultra-wide reference implementation.
+local function uw_scaling_factor(s) return (3440 / s.workarea.width - 1) * 50 end
+
 function make_tray(s)
   local t = wibox.widget.systray();
   t.visible = true;
@@ -223,7 +226,7 @@ function make_tray(s)
 
     -- Update tasklist_r width
     local width_r = (s.workarea.width / 2) - 310
-      - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) - num_entries * 32;
+      - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) - num_entries * 32 + (uw_scaling_factor(s) * 2);
 
     root.elements.tasklist[s.index][2].width = width_r
   end)
@@ -423,6 +426,7 @@ function awful.widget.tasklist.filter.client_filter_r(c, s)
   end)
 end
 
+
 function make_tasklist(s)
   local tasklist_buttons = gears.table.join(
     awful.button({ }, 1, function (c)
@@ -444,8 +448,9 @@ function make_tasklist(s)
     end)
   )
 
+
   local uw = config.global.m-4;
-  local width = (s.workarea.width / 2) - (config.topbar.w) - uw / 2 - config.global.m * 36;
+  local width = (s.workarea.width / 2) - (config.topbar.w) - uw / 2 - config.global.m * 36 + (uw_scaling_factor(s) * 2);
 
   local tasklist = wibox({
     screen = s,
@@ -461,7 +466,8 @@ function make_tasklist(s)
   -- Create layoutbox already to get offset
   make_layoutbox(s)
 
-  local width_r = (s.workarea.width / 2) - 310 - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x);
+  local width_r = (s.workarea.width / 2) - 310
+    - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) + (uw_scaling_factor(s) * 2);
 
   local tasklist_r = wibox({
     screen = s,
@@ -477,11 +483,11 @@ function make_tasklist(s)
   -- tasklist:connect_signal("mouse::leave", function(t) t.visible = false end)
 
   tasklist:struts({ top = config.topbar.h + config.global.m });
-  tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 12;
+  tasklist.x = s.workarea.x + (config.topbar.w * 2) + config.global.m * 12 - uw_scaling_factor(s);
   tasklist.y = config.global.m;
 
   tasklist_r:struts({ top = config.topbar.h + config.global.m });
-  tasklist_r.x = s.workarea.x + (s.workarea.width / 2) + (config.topbar.dw) - config.topbar.w * 2 - config.global.m;
+  tasklist_r.x = s.workarea.x + (s.workarea.width / 2) + (config.topbar.dw) - config.topbar.w * 2 - config.global.m - uw_scaling_factor(s);
   tasklist_r.y = config.global.m;
 
   beautiful.tasklist_bg_normal = config.colors.w .. '60';
