@@ -375,6 +375,7 @@ function make_taglist(s)
   root.elements.taglist[s.index] = taglist;
 end
 
+-- based on: https://github.com/awesomeWM/awesome/blob/master/lib/awful/widget/tasklist.lua#L710
 local function filter_internals(c, s, condition)
   scr = s
   -- Only print client on the same screen as this widget
@@ -385,6 +386,9 @@ local function filter_internals(c, s, condition)
     if t.selected then
       local ctags = c:tags()
       local tag_clients = t:clients()
+
+      -- Hide if there is only 1 client that is not minimized.
+      if #tag_clients == 1 and not c.minimized then return false end
 
       local tags_div = math.floor(#tag_clients / 2)
       local l_clients = #tag_clients - tags_div

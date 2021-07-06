@@ -295,7 +295,6 @@ for i = 0, 9 do
     local num_clients = count_clients(true)
     local screen_idx = awful.screen.focused().index
 
-    bar_hygenie()
     local t = awful.screen.focused().selected_tag
     reset_mfact(t, num_clients)
 
@@ -307,19 +306,6 @@ for i = 0, 9 do
     if c == nil then return end
     awful.client.focus.byidx(0, c)
   end)
-
-  function bar_hygenie()
-    local clients = count_clients(false)
-    local screen_idx = awful.screen.focused().index
-
-    if clients < 2 then
-      if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = false end
-    end
-
-    if clients >= 2 then
-      if bar_visibility[screen_idx] == true then root.elements.topbar.tasklist()[screen_idx].visible = true end
-    end
-  end
 
   client.disconnect_signal("request::geometry", awful.ewmh.geometry)
   client.connect_signal("request::geometry", function(c, context, ...)
@@ -382,11 +368,6 @@ for i = 0, 9 do
     c.ontop = false
   end)
 
-
-  -- hide / show clients in tasklist
-  tag.connect_signal('property::selected', function(t)
-    bar_hygenie()
-  end)
 
   -- SPAWNS
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
