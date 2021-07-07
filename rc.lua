@@ -9,6 +9,7 @@ local beautiful = require('beautiful');
 local inspect = require('inspect')
 local key_bindings = require('helpers.keybindings')
 require('./errors')();
+require('helpers.cycle_border')
 
 local capi = {
   awesome = awesome,
@@ -19,7 +20,8 @@ local capi = {
 root.elements = root.elements or {}
 
 -- THEME
-beautiful.useless_gap = 4
+beautiful.useless_gap = 3
+beautiful.border_width = 3
 
 -- MODKEY
 modkey = 'Mod4'
@@ -97,12 +99,13 @@ local function setup_columns(t)
   end
 end
 
+client.connect_signal("unfocus", function(c)
+  c.border_color = config.colors.t
+end)
+
 tag.connect_signal("property::layout", function(t)
   setup_columns(t)
 end)
-
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
 -- TAG KEYBINDS
 for i = 0, 9 do
@@ -371,7 +374,6 @@ for i = 0, 9 do
     c.above = false
     c.ontop = false
   end)
-
 
   -- SPAWNS
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
