@@ -61,9 +61,6 @@ if not root.elements.powermenu then require('elements.powermenu')() end;
 local last_client = nil;
 local bottom = true;
 
-local bar_visibility = {};
-awful.screen.connect_for_each_screen(function(s) bar_visibility[s.index] = true end);
-
 for _, key in ipairs(key_bindings) do
   awful.keyboard.append_global_keybinding(key)
 end

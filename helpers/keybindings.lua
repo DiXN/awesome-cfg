@@ -8,6 +8,9 @@ alt = 'Mod1'
 
 local vol_timer = nil
 
+local bar_visibility = {};
+awful.screen.connect_for_each_screen(function(s) bar_visibility[s.index] = true end);
+
 local function init_vol_timer()
   vol_timer = gears.timer {
     timeout   = 2,
