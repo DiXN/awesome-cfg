@@ -6,7 +6,6 @@ local ruled = require('ruled');
 local naughty = require('naughty');
 local config = require('helpers.config');
 local beautiful = require('beautiful');
-local inspect = require('inspect')
 local key_bindings = require('helpers.keybindings')
 require('./errors')();
 require('helpers.cycle_border')
