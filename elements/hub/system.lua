@@ -262,12 +262,12 @@ return function()
   }
 
   awful.widget.watch(config.commands.ramcmd, 5, function(w,o)
-  local n = tonumber(o);
+    local n = tonumber(o);
     ram_progress:set_value(n);
     ram_value.text = o:gsub("^%s*(.-)%s*$", "%1").."%";
   end);
 
-  awful.widget.watch(config.commands.cpucmd, 5, function(w,o,e,r,c)
+  awful.widget.watch(config.commands.cpucmd, 1, function(w,o,e,r,c)
     local n = tonumber(o);
     cpu_progress:set_value(n);
     cpu_value.text = o:gsub("^%s*(.-)%s*$", "%1").."%";
@@ -279,13 +279,13 @@ return function()
     end;
   end);
 
-  awful.widget.watch(config.commands.diskcmd, 5, function(w,o)
+  awful.widget.watch(config.commands.diskcmd, 10, function(w,o)
     local val = o:gsub("%%",""):gsub("^%s*(.-)%s*$", "%1");
     disk_progress:set_value(tonumber(val));
     disk_value.text = val.."%";
   end);
 
-  awful.widget.watch(config.commands.proccmd, 5, function(w, o)
+  awful.widget.watch(config.commands.proccmd, 3, function(w, o)
     proc_text.text = o:gsub("^%s*(.-)%s*$", "%1");
   end);
 
