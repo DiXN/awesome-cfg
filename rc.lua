@@ -381,9 +381,8 @@ for i = 0, 9 do
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
-  awful.spawn.with_shell("pulseeffects --gapplication-service");
   awful.spawn.with_shell("nm-applet &");
-  awful.spawn.with_shell('instantmouse s "$(iconf mousespeed)"');
+  awful.spawn.with_shell('instantmouse g && instantmouse s "$(iconf mousespeed)"');
   awful.spawn.with_shell("numlockx");
 
   -- IDLE
