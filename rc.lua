@@ -146,7 +146,6 @@ for i = 0, 9 do
       awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
       awful.key({ modkey, "Shift" }, "f", function(c)
         c.fake_full = not c.fake_full
-
         if c.fake_full then c.fullscreen = true end
       end),
     });
@@ -249,6 +248,45 @@ for i = 0, 9 do
       properties = {
         raise = true,
         fullscreen = true,
+      }
+    }
+
+    ruled.client.append_rule {
+      rule_any = {
+        class = { "csgo_linux64", "love", "steam_app_311210" }
+      },
+      properties = {
+        hover_focus = false,
+        callback = function(c)
+
+          function spawn_picom()
+            awful.spawn.easy_async_with_shell("pgrep picom", function(o)
+              if o == '' then
+                awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
+              end
+            end)
+          end
+
+          local fullscreen_timer = gears.timer {
+            timeout   = 2,
+            autostart = true,
+            callback  = function()
+              if not c.fullscreen then
+                spawn_picom()
+              else
+                awful.spawn.with_shell("killall picom");
+              end
+            end
+        }
+
+        client.connect_signal("unmanage", function(c_unmanage)
+          if c == c_unmanage then
+            fullscreen_timer:stop()
+            spawn_picom()
+          end
+        end)
+
+        end
       }
     }
 
