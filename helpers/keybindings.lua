@@ -34,7 +34,6 @@ local function init_vol_timer()
   }
 end
 
-
 local function vol()
   local media_view = root.elements.hub_views[6]
   media_view.view.refresh()
@@ -51,6 +50,12 @@ local function vol()
   root.elements.hub.bg = config.colors.t
   root.elements.hub.enable_view_by_index(6, mouse.screen, 'vol')
   if vol_timer ~= nil then vol_timer:again() else init_vol_timer() end
+end
+
+function reset_fullscreen()
+  for _, c in ipairs(client.get()) do
+    if c.fullscreen and c.fake_full == false then c:emit_signal("reset_fullscreen") end
+  end
 end
 
 --GLOBAL KEYBINDS/BUTTONS
@@ -81,8 +86,15 @@ local key_bindings = gears.table.join({
     end
   end),
 
-  awful.key({ modkey }, "j", function() awful.client.focus.byidx(-1) end),
-  awful.key({ modkey }, "k", function() awful.client.focus.byidx(1) end),
+  awful.key({ modkey }, "j", function()
+    reset_fullscreen()
+    awful.client.focus.byidx(-1)
+  end),
+  awful.key({ modkey }, "k", function()
+    reset_fullscreen()
+    awful.client.focus.byidx(1)
+  end),
+
   awful.key({ modkey, "Shift" }, "j", function() awful.client.swap.byidx(1) end),
   awful.key({ modkey, "Shift" }, "k", function() awful.client.swap.byidx(-1) end),
 

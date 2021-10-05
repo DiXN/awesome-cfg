@@ -6,12 +6,17 @@ local rounded = require('helpers.rounded');
 local beautiful = require('beautiful');
 local xrdb = beautiful.xresources.get_current_theme();
 local config = require('helpers.config');
+local awful = require('awful');
 
 function toggle_tag_switcher()
   awful.screen.connect_for_each_screen(function(screen)
     screen.tagswitch.visible = not screen.tagswitch.visible;
     screen.taskpop.visible = not screen.taskpop.visible
   end);
+
+  for _, c in ipairs(client.get()) do
+    if c.fullscreen and c.fake_full == false then c:emit_signal("reset_fullscreen") end
+  end
 end
 
 function add_new_tag()

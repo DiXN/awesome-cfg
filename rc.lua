@@ -377,6 +377,13 @@ for i = 0, 9 do
     c.ontop = false
   end)
 
+  client.connect_signal("reset_fullscreen", function(c)
+    if c.fake_full == false and c.fullscreen then
+      c.fullscreen = not c.fullscreen
+      c:emit_signal("tiled")
+    end
+  end)
+
   -- SPAWNS
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
