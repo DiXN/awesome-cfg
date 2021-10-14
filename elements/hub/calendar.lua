@@ -31,12 +31,37 @@ return function()
   cal_container.forced_height = config.hub.w - config.hub.nw - (config.global.m*2);
 
   cal_container:setup {
-    layout = wibox.container.margin,
-    left = config.global.m, right = 40,
+    layout = wibox.container.place,
+    valign = "center",
+    halign = "center",
     {
-      date = os.date('*t'),
-      font = config.fonts.tml,
-      widget = wibox.widget.calendar.month,
+      layout = wibox.layout.grid,
+      horizontal_spacing = 30,
+      vertical_spacing = 60,
+      forced_num_cols = 2,
+      forced_num_rows = 2,
+      expand = true,
+      left = config.global.m, right = config.global.m, bottom = config.global.m,
+      {
+        date = {month = os.date('*t').month - 1, year = os.date('*t').year},
+        font = config.fonts.tll,
+        widget = wibox.widget.calendar.month,
+      },
+      {
+        date = os.date('*t'),
+        font = config.fonts.tll,
+        widget = wibox.widget.calendar.month,
+      },
+      {
+        date = {month = os.date('*t').month + 1, year = os.date('*t').year},
+        font = config.fonts.tll,
+        widget = wibox.widget.calendar.month,
+      },
+      {
+        date = {month = os.date('*t').month + 2, year = os.date('*t').year},
+        font = config.fonts.tll,
+        widget = wibox.widget.calendar.month,
+      }
     }
   }
 
