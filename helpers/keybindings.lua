@@ -150,6 +150,8 @@ local key_bindings = gears.table.join({
       awful.util.spawn(config.commands.mute) end),
   awful.key({modkey, "Shift", "Control"}, "d", function() awful.spawn.easy_async(config.commands.voldown, vol) end),
   awful.key({modkey, "Shift", "Control"}, "u", function() awful.spawn.easy_async(config.commands.volup, vol) end),
+
+  awful.key({modkey, "Shift"}, "s", function() awful.spawn.with_shell(config.commands.switch_inputs) end),
 })
 
 return key_bindings
