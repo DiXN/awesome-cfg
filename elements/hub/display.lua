@@ -192,12 +192,12 @@ return function()
             }
           }
         },
-        { layout = wibox.container.margin, top = config.global.m, monitors }, changewall,
+        { layout = wibox.container.margin, top = config.global.m, monitors },
         {
           layout = wibox.layout.fixed.vertical,
           {
             layout = wibox.container.background,
-            bg = config.colors.f,
+            bg = config.colors.t,
             shape = rounded(),
             forced_height = (config.global.m*14) + config.global.slider,
             {
