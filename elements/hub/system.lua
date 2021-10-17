@@ -292,14 +292,16 @@ return function()
   awful.widget.watch(config.commands.vol, 2, function(w,o,e,r,c)
     local n = tonumber(o);
 
-    awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
-      for _, i in pairs(root.elements.vol_icons) do
-        if c == 0 then i.update(config.icons.vol_mute, config.colors.x9)
-        elseif n >= 75 then i.update(config.icons.vol_3, config.colors.x9)
-        elseif n >= 50 then i.update(config.icons.vol_2, config.colors.x11)
-        else i.update(config.icons.vol_1, config.colors.x10) end;
-      end;
-    end);
+    if n then
+      awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
+        for _, i in pairs(root.elements.vol_icons) do
+          if c == 0 then i.update(config.icons.vol_mute, config.colors.x9)
+          elseif n >= 75 then i.update(config.icons.vol_3, config.colors.x9)
+          elseif n >= 50 then i.update(config.icons.vol_2, config.colors.x11)
+          else i.update(config.icons.vol_1, config.colors.x10) end;
+        end;
+      end);
+    end
   end);
 
   if config.topbar.utilities.bat then
