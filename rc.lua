@@ -176,12 +176,12 @@ for i = 0, 9 do
         c.fake_full = not c.fake_full
         if c.fake_full then c.fullscreen = true end
       end),
-      awful.key({ modkey }, 'y', function() bling.module.tabbed.pick() end),
-      awful.key({ modkey, "Control" }, 'y', function(c)
+      awful.key({ modkey }, 'y', function(c) bling.module.tabbed.init(c) end),
+      awful.key({ modkey, "Control" }, 'r', function(c)
         bling.module.tabbed.add(c, get_tab_container())
         reset_mfact()
       end),
-      awful.key({ modkey, alt }, 'y', function(c)
+      awful.key({ modkey, alt }, 'r', function(c)
         bling.module.tabbed.remove(c)
         reset_mfact()
       end),
@@ -217,10 +217,10 @@ for i = 0, 9 do
         awful.client.swap.byidx(-1);
       end),
       awful.button({ modkey }, 4, function()
-        awful.client.focus.byidx(1);
+        bling.module.tabbed.iter()
       end),
       awful.button({ modkey }, 5, function()
-        awful.client.focus.byidx(-1);
+        bling.module.tabbed.iter()
       end)
     });
   end);
