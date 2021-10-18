@@ -8,7 +8,12 @@ local config = require('helpers.config');
 local beautiful = require('beautiful');
 local key_bindings = require('helpers.keybindings')
 require('./errors')();
-require('helpers.cycle_border')
+
+local beautiful = require("beautiful")
+beautiful.init(gears.filesystem.get_configuration_dir() .. '/bling_theme.lua')
+
+local bling = require("bling")
+bling.module.flash_focus.enable()
 
 local capi = {
   awesome = awesome,
@@ -87,6 +92,8 @@ local function is_ultra_wide()
 end
 
 local function setup_columns(t)
+  local t = awful.screen.focused().selected_tag
+
   if is_ultra_wide() then
     if t.col_count == nil then t.col_count = 2 end
 
@@ -102,9 +109,7 @@ client.connect_signal("unfocus", function(c)
   c.border_color = config.colors.t
 end)
 
-tag.connect_signal("property::layout", function(t)
-  setup_columns(t)
-end)
+tag.connect_signal("property::layout", function() setup_columns() end)
 
 -- TAG KEYBINDS
 for i = 0, 9 do
@@ -137,6 +142,29 @@ for i = 0, 9 do
     c:activate { context = "mouse_enter", raise = false }
   end)
 
+  local function get_tab_container()
+    local t = awful.screen.focused().selected_tag
+
+    if t ~= nil then
+      for _, c in ipairs(t:clients()) do
+        if c and c.bling_tabbed then return c.bling_tabbed end
+      end
+    end
+
+    return nil
+  end
+
+  local function reset_mfact()
+    local num_clients = count_clients(true)
+    local t = awful.screen.focused().selected_tag
+
+    if is_ultra_wide() and num_clients > 2 then
+      t.master_width_factor = 0.38
+    else
+      t.master_width_factor = 0.5
+    end
+  end
+
   -- CLIENT KEYBINDS & BUTTONS
   client.connect_signal("request::default_keybindings", function(c)
     awful.keyboard.append_client_keybindings({
@@ -147,6 +175,15 @@ for i = 0, 9 do
       awful.key({ modkey, "Shift" }, "f", function(c)
         c.fake_full = not c.fake_full
         if c.fake_full then c.fullscreen = true end
+      end),
+      awful.key({ modkey }, 'y', function() bling.module.tabbed.pick() end),
+      awful.key({ modkey, "Control" }, 'y', function(c)
+        bling.module.tabbed.add(c, get_tab_container())
+        reset_mfact()
+      end),
+      awful.key({ modkey, alt }, 'y', function(c)
+        bling.module.tabbed.remove(c)
+        reset_mfact()
       end),
     });
   end);
@@ -323,6 +360,7 @@ for i = 0, 9 do
 
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
+
     c:emit_signal("client_change")
   end)
 
@@ -330,22 +368,9 @@ for i = 0, 9 do
     c:emit_signal("client_change")
   end)
 
-  local function reset_mfact(t, num_clients)
-    if is_ultra_wide() and num_clients > 2 then
-      t.master_width_factor = 0.38
-    else
-      t.master_width_factor = 0.5
-    end
-  end
-
   client.connect_signal("client_change", function()
-    local num_clients = count_clients(true)
-    local screen_idx = awful.screen.focused().index
-
-    local t = awful.screen.focused().selected_tag
-    reset_mfact(t, num_clients)
-
-    setup_columns(t)
+    reset_mfact()
+    setup_columns()
 
     -- https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/ggjom5n?utm_source=share&utm_medium=web2x&context=3
     local s = awful.screen.focused()
@@ -382,11 +407,7 @@ for i = 0, 9 do
     end
   end)
 
-  client.connect_signal("property::minimized", function(c)
-    local t = c.first_tag
-    local clients = count_clients(true)
-    reset_mfact(t, clients)
-  end)
+  client.connect_signal("property::minimized", function(c) reset_mfact() end)
 
   -- switch to client of other tag
   client.connect_signal("request::activate", function(c)
@@ -400,14 +421,7 @@ for i = 0, 9 do
     end
   end)
 
-  client.connect_signal("property::floating", function(c)
-    local num_clients = count_clients(true)
-    local t = c.first_tag
-
-    if t ~= nil then
-      reset_mfact(t, num_clients)
-    end
-  end)
+  client.connect_signal("property::floating", function() reset_mfact() end)
 
   client.connect_signal("tiled", function(c)
     c:lower()
@@ -446,4 +460,3 @@ for i = 0, 9 do
 
   awful.layout.set(awful.layout.suit.max)
   awful.layout.set(awful.layout.suit.tile)
-
