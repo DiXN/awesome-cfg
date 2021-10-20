@@ -421,7 +421,14 @@ for i = 0, 9 do
     end
   end)
 
-  client.connect_signal("property::floating", function() reset_mfact() end)
+  client.connect_signal("property::floating", function(c)
+    if c.floating and c.fake_full ~= false and not c.fullscreen then
+      c.above = true
+      c.ontop = true
+    end
+
+    reset_mfact()
+  end)
 
   client.connect_signal("tiled", function(c)
     c:lower()
