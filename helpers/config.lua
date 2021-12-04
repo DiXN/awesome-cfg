@@ -189,7 +189,7 @@ local config = {
     batcmd = 'bash -c "acpi -V | grep -m 1 \'Battery 1\' | awk -F, \'{print $2}\' | sed \'s/%//\'"',
     secondary = 'xrandr --output HDMI-0 --mode 2560x1440 --right-of DP-4 --output DP-4 --off',
     secondthird = 'xrandr --output HDMI-0 --mode 2560x1440 --right-of DP-4 && xrandr --output DP-3 --mode 1360x768 --right-of HDMI-0 && xrandr --output DP-4 --off',
-    switch_inputs = 'ACTION=add SUBSYSTEM=usb DEVTYPE=usb_device BUSNUM=001 DEVNUM=014 ~/Documents/usb-libvirt-hotplug.sh "win10-uefi" && ACTION=add SUBSYSTEM=usb DEVTYPE=usb_device BUSNUM=001 DEVNUM=015 ~/Documents/usb-libvirt-hotplug.sh "win10-uefi"'
+    switch_inputs = gears.filesystem.get_configuration_dir()..'scripts/hotplug_wrapper.sh'..' add',
   },
   notifications = {
     w = 200,
