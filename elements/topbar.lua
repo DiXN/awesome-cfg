@@ -433,11 +433,12 @@ function make_tasklist(s)
     if c == client.focus then
       c.minimized = true
     else
-      c:emit_signal(
-        "request::activate",
-        "tasklist",
+      c:emit_signal("request::activate", "tasklist",
         {raise = true}
       )
+
+      c.above = true
+      c.ontop = true
     end
     end),
     awful.button({ }, 4, function ()

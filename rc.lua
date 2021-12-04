@@ -198,6 +198,12 @@ for i = 0, 9 do
         if not c.floating then c.floating = true end
         c:activate { context = "mouse_click", action = "mouse_move" }
       end),
+      awful.button({ modkey, "Shift" }, 1, function (c)
+        if not c.floating then c.floating = true end
+        c.above = true
+        c.ontop = true
+        c:activate { context = "mouse_click", action = "mouse_move" }
+      end),
       awful.button({ modkey, "Shift" }, 3, function (c)
         if not c.minimized then c.minimized = true end
       end),
