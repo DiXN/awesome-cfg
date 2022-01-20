@@ -261,6 +261,21 @@ return function()
     }
   }
 
+  -- Change color of notification icon if there is more than one active notification.
+  gears.timer {
+    timeout   = 3,
+    autostart = true,
+    callback  = function()
+      for _, i in pairs(root.elements.note_icons) do
+        if #naughty.active > 0 then
+          i.update(config.icons.mem, config.colors.x0)
+        else
+          i.update(config.icons.mem, config.colors.w)
+        end
+      end
+    end
+  }
+
   awful.widget.watch(config.commands.ramcmd, 5, function(w,o)
     local n = tonumber(o);
     ram_progress:set_value(n);
