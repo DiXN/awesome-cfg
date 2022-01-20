@@ -13,7 +13,6 @@ local beautiful = require("beautiful")
 beautiful.init(gears.filesystem.get_configuration_dir() .. '/bling_theme.lua')
 
 local bling = require("bling")
-bling.module.flash_focus.enable()
 
 local capi = {
   awesome = awesome,
@@ -139,7 +138,10 @@ for i = 0, 9 do
   });
 
   client.connect_signal("mouse::enter", function(c)
-    c:activate { context = "mouse_enter", raise = false }
+    if awful.layout.get() ~= awful.layout.suit.max then
+      c:activate { context = "mouse_enter", raise = false }
+      bling.module.flash_focus.flashfocus(c)
+    end
   end)
 
   local function get_tab_container()
