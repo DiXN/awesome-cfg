@@ -110,6 +110,17 @@ end)
 
 tag.connect_signal("property::layout", function() setup_columns() end)
 
+local function reset_mfact(focused_tag)
+  local num_clients = count_clients(true, focused_tag)
+  local t = focused_tag or awful.screen.focused().selected_tag
+
+  if is_ultra_wide() and num_clients > 2 then
+    t.master_width_factor = 0.38
+  else
+    t.master_width_factor = 0.5
+  end
+end
+
 -- TAG KEYBINDS
 for i = 0, 9 do
   local spot = i;
@@ -121,9 +132,21 @@ for i = 0, 9 do
       if tag then tag:view_only() end;
     end),
     awful.key({ modkey, 'Shift'}, spot, function()
-      local tag = root.tags()[i];
-        if tag and client.focus then client.focus:move_to_tag(tag) end;
-        tag:view_only();
+      local tag = root.tags()[i]
+      if tag and client.focus then client.focus:move_to_tag(tag) end
+      current_tag = awful.screen.focused().selected_tag
+      tag:view_only()
+
+      gears.timer {
+        timeout   = 0.1,
+        autostart = true,
+        single_shot = true,
+        callback  = function()
+          reset_mfact(current_tag)
+          reset_mfact(tag)
+        end
+      }
+
       end)
     });
   end
@@ -154,17 +177,6 @@ for i = 0, 9 do
     end
 
     return nil
-  end
-
-  local function reset_mfact()
-    local num_clients = count_clients(true)
-    local t = awful.screen.focused().selected_tag
-
-    if is_ultra_wide() and num_clients > 2 then
-      t.master_width_factor = 0.38
-    else
-      t.master_width_factor = 0.5
-    end
   end
 
   -- CLIENT KEYBINDS & BUTTONS
@@ -368,10 +380,10 @@ for i = 0, 9 do
     }
   end);
 
-  function count_clients(consider_floats)
+  function count_clients(consider_floats, focused_tag)
     local n = 0
 
-    local t = awful.screen.focused().selected_tag
+    local t = focused_tag or awful.screen.focused().selected_tag
 
     if t ~= nil then
       for _, c in ipairs(t:clients()) do
