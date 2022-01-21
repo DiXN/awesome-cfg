@@ -286,23 +286,18 @@ for i = 0, 9 do
 
     ruled.client.append_rule {
       rule_any = {
-        class    = {
-          "mpv"
-        },
+        class = { "csgo_linux64", "love", "steam_app_311210", "mpv", "openrct2", "Parkitect.x86_64" }
       },
       properties = {
         raise = true,
         fullscreen = true,
-      }
-    }
-
-    ruled.client.append_rule {
-      rule_any = {
-        class = { "csgo_linux64", "love", "steam_app_311210" }
-      },
-      properties = {
         hover_focus = false,
         callback = function(c)
+          if c.minimized == true then
+            c.minimized = false
+          end
+
+          awful.spawn.with_shell("easyeffects --gapplication-service");
 
           function spawn_picom()
             awful.spawn.easy_async_with_shell("pgrep picom", function(o)
@@ -322,7 +317,30 @@ for i = 0, 9 do
                 awful.spawn.with_shell("killall picom");
               end
             end
-        }
+          }
+
+          ignored_clients = { "csgo_linux64" }
+
+          ignored = false
+
+          for _, ignored_client in ipairs(ignored_clients) do
+              if ignored_client == c.class then
+                  ignored = true
+              end
+          end
+
+          if ignored == false then
+            local time_tracker = gears.timer {
+              timeout   = 2,
+              single_shot = true,
+              autostart = true,
+              callback  = function()
+                awful.spawn.easy_async_with_shell("~/Documents/time-tracker.vsh --insert " .. c.class, function(stdout, stderr, reason, exit_code)
+                  naughty.notify({ title = 'TimeTracker', text = stdout, timeout = 0 })
+                end)
+              end
+            }
+          end
 
         client.connect_signal("unmanage", function(c_unmanage)
           if c == c_unmanage then
