@@ -206,16 +206,25 @@ for i = 0, 9 do
     awful.mouse.append_client_mousebindings({
       awful.button({}, 1, function (c)
         if root.elements.hub then root.elements.hub.close() end
-        c:activate { context = "mouse_move", raise = true }
+
+        if awful.layout.get() ~= awful.layout.suit.max then
+          c:activate { context = "mouse_move", raise = true }
+        else
+          c:activate { context = "mouse_click", raise = true }
+        end
       end),
       awful.button({ modkey }, 1, function (c)
         if not c.floating then c.floating = true end
+        c.above = true
+        c.ontop = true
         c:activate { context = "mouse_click", action = "mouse_move" }
       end),
       awful.button({ modkey, "Shift" }, 1, function (c)
         if not c.floating then c.floating = true end
-        c.above = true
-        c.ontop = true
+
+        if c.above then c.above = false end
+        if c.ontop then c.ontop = false end
+
         c:activate { context = "mouse_click", action = "mouse_move" }
       end),
       awful.button({ modkey, "Shift" }, 3, function (c)
@@ -435,13 +444,20 @@ for i = 0, 9 do
           autostart = true,
           single_shot = true,
           callback  = function()
-            c.fullscreen = false
             geo.height = geo.height + 1
+            c.fullscreen = false
           end
         }
       else
         awful.ewmh.geometry(c, context, ...)
       end
+    end
+  end)
+
+  client.connect_signal("property::fullscreen", function(c)
+    if c.floating and c.fullscreen == false then
+      c.above = true
+      c.ontop = true
     end
   end)
 
@@ -459,18 +475,9 @@ for i = 0, 9 do
     end
   end)
 
-  client.connect_signal("property::floating", function(c)
-    if c.floating and c.fake_full ~= false and not c.fullscreen then
-      c.above = true
-      c.ontop = true
-    end
-
-    reset_mfact()
-  end)
+  client.connect_signal("property::floating", function(c) reset_mfact() end)
 
   client.connect_signal("tiled", function(c)
-    c:lower()
-    c.above = false
     c.ontop = false
   end)
 
