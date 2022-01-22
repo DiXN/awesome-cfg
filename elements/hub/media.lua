@@ -7,7 +7,12 @@ local config = require('helpers.config');
 local beautiful = require('beautiful');
 local rounded = require('helpers.rounded');
 local xrdb = beautiful.xresources.get_current_theme();
-local saved_spotify_state = nil;
+local inspect = require('inspect')
+local bling = require("bling")
+
+playerctl = bling.signal.playerctl.lib {
+  player = { "ncspot", "%any" }
+}
 
 return function()
   local view = wibox.container.margin();
@@ -97,18 +102,22 @@ return function()
 
   local next = wibox.widget.textbox(config.icons.next);
   next.font = config.fonts.txxlb;
+
   next:connect_signal('mouse::enter', function()
     next.markup = '<span foreground="'..config.colors.x4..'">'..next.text..'</span>';
   end);
+
   next:connect_signal('mouse::leave', function()
     next.text = next.text;
   end);
 
   local prev = wibox.widget.textbox(config.icons.prev);
   prev.font = config.fonts.txxlb;
+
   prev:connect_signal('mouse::enter', function()
     prev.markup = '<span foreground="'..config.colors.x4..'">'..prev.text..'</span>';
   end);
+
   prev:connect_signal('mouse::leave', function()
     prev.text = prev.text;
   end);
@@ -136,40 +145,42 @@ return function()
     }
   };
 
-  local media_watch = awful.widget.watch(config.commands.spotify_state, 1, function(w,o,e,r,c)
-    cmdstate = {}
-    o:gsub("[^\r\n]+", function(m) table.insert(cmdstate, m) end);
-
-    play.text = (cmdstate[1] == 'not playing') and config.icons.play or config.icons.pause;
-
-    if gears.filesystem.file_readable("/tmp/spot/album.png") then
-      album_icon:set_image(gears.surface.load_uncached_silently("/tmp/spot/album.png"));
-      spotify.first = album_icon;
+  playerctl:connect_signal("metadata", function(player, title, artist, album_path, album, new, player_name)
+    if album_path ~= '' then
+      album_icon:set_image(gears.surface.load_uncached(album_path))
+      spotify.first = album_icon
     else
       spotify.first = icon
     end
 
-    spotify_title.text = cmdstate[2];
-    spotify_message.text = cmdstate[3];
-  end);
+    spotify_title.text = title
+    spotify_message.text = artist
+  end)
+
+  playerctl:connect_signal("playback_status", function(player, playing, player_name)
+    play.text = playing and config.icons.pause or config.icons.play
+  end)
+
+  playerctl:connect_signal("exit", function(player)
+    play.text = config.icons.play
+    spotify_title.text = 'Nothing playing'
+    spotify_message.text = ''
+  end)
 
   play:buttons(gears.table.join(
     awful.button({}, 1, function()
-      media_watch:emit_signal('timeout')
       awful.spawn.with_shell(config.commands.play);
     end)
   ));
 
   next:buttons(gears.table.join(
     awful.button({}, 1, function()
-      media_watch:emit_signal('timeout')
       awful.spawn.with_shell(config.commands.next);
     end)
   ));
 
   prev:buttons(gears.table.join(
     awful.button({}, 1, function()
-      media_watch:emit_signal('timeout')
       awful.spawn.with_shell(config.commands.prev);
     end)
   ));
@@ -198,8 +209,6 @@ return function()
     awful.spawn.easy_async_with_shell(config.commands.vol, function(o)
       vol_slider:set_value(tonumber(o));
     end);
-
-    media_watch:emit_signal('timeout')
 
     mute_handling()
   end

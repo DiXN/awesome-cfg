@@ -139,6 +139,15 @@ local key_bindings = gears.table.join({
   awful.key({}, "XF86AudioLowerVolume", function()
     awful.spawn.easy_async(config.commands.voldown, vol);
   end),
+  awful.key({}, "XF86AudioPlay", function ()
+    awful.spawn.easy_async(config.commands.play, vol);
+  end),
+  awful.key({}, "XF86AudioNext", function()
+    awful.spawn.easy_async(config.commands.next, vol);
+  end),
+  awful.key({}, "XF86AudioPrev", function()
+    awful.spawn.easy_async(config.commands.play, vol);
+  end),
   awful.key({modkey, "Shift" }, "Up", function ()
     awful.spawn.easy_async(config.commands.volup, vol);
   end),
