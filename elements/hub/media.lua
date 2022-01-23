@@ -145,6 +145,20 @@ return function()
     }
   };
 
+  local media_progress = wibox.container.background()
+  media_progress.bg = config.colors.x1
+
+  playerctl:connect_signal("position", function(player, interval, length, player_name)
+    if interval ~= 0.0 then
+      media_progress.visible = true
+      local max_width = (config.hub.w - config.hub.nw) - (config.global.m*2)
+      local current_progress = math.floor(interval / length * max_width)
+      media_progress.forced_width = current_progress
+    else
+      media_progress.visible = false
+    end
+  end)
+
   playerctl:connect_signal("metadata", function(player, title, artist, album_path, album, new, player_name)
     if album_path ~= '' then
       album_icon:set_image(gears.surface.load_uncached(album_path))
@@ -153,8 +167,10 @@ return function()
       spotify.first = icon
     end
 
-    spotify_title.text = title
-    spotify_message.text = artist
+    if title ~= '' then
+      spotify_title.text = title
+      spotify_message.text = artist
+    end
   end)
 
   playerctl:connect_signal("playback_status", function(player, playing, player_name)
@@ -274,15 +290,28 @@ return function()
         }
       },
       {
-        layout = wibox.container.background,
-        bg = config.colors.f,
-        shape = rounded(),
-        forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
         {
-          layout = wibox.container.margin,
-          margins = config.global.m,
-          spotify
-        }
+          layout = wibox.container.background,
+          shape = rounded(),
+          forced_height = 140 + config.global.m, -- cannot be computed (album_icon + config.global.m)
+          forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
+          {
+            layout = wibox.layout.fixed.horizontal,
+            media_progress
+          }
+        },
+        {
+          layout = wibox.container.background,
+          shape = rounded(),
+          bg = config.colors.f,
+          forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
+          {
+            layout = wibox.container.margin,
+            margins = config.global.m,
+            spotify
+          }
+        },
+        layout = wibox.layout.stack
       },
       id ="view_background_role"
     }
