@@ -10,7 +10,7 @@ local xrdb = beautiful.xresources.get_current_theme();
 local inspect = require('inspect')
 local bling = require("bling")
 
-playerctl = bling.signal.playerctl.lib {
+local playerctl = bling.signal.playerctl.lib {
   player = { "ncspot", "%any" }
 }
 
@@ -148,18 +148,23 @@ return function()
   local media_progress = wibox.container.background()
   media_progress.bg = config.colors.x1
 
-  playerctl:connect_signal("position", function(player, interval, length, player_name)
-    if interval ~= 0.0 then
-      media_progress.visible = true
-      local max_width = (config.hub.w - config.hub.nw) - (config.global.m*2)
-      local current_progress = math.floor(interval / length * max_width)
-      media_progress.forced_width = current_progress
-    else
-      media_progress.visible = false
-    end
+  local function player_exit()
+    play.text = config.icons.play
+    spotify_title.text = 'Nothing playing'
+    spotify_message.text = ''
+    media_progress.visible = false
+  end
+
+  playerctl:connect_signal("exit", function(_) player_exit() end)
+
+  playerctl:connect_signal("position", function(_, interval, length, player_name)
+    media_progress.visible = true
+    local max_width = (config.hub.w - config.hub.nw) - (config.global.m*2)
+    local current_progress = math.floor(interval / length * max_width)
+    media_progress.forced_width = current_progress
   end)
 
-  playerctl:connect_signal("metadata", function(player, title, artist, album_path, album, new, player_name)
+  playerctl:connect_signal("metadata", function(_, title, artist, album_path, album, new, player_name)
     if album_path ~= '' then
       album_icon:set_image(gears.surface.load_uncached(album_path))
       spotify.first = album_icon
@@ -170,18 +175,15 @@ return function()
     if title ~= '' then
       spotify_title.text = title
       spotify_message.text = artist
+    else
+      player_exit()
     end
   end)
 
-  playerctl:connect_signal("playback_status", function(player, playing, player_name)
+  playerctl:connect_signal("playback_status", function(_, playing, player_name)
     play.text = playing and config.icons.pause or config.icons.play
   end)
 
-  playerctl:connect_signal("exit", function(player)
-    play.text = config.icons.play
-    spotify_title.text = 'Nothing playing'
-    spotify_message.text = ''
-  end)
 
   play:buttons(gears.table.join(
     awful.button({}, 1, function()
