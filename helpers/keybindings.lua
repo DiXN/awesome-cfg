@@ -1,6 +1,7 @@
 local awful = require('awful');
 local config = require('helpers.config');
 local gears = require('gears');
+local beautiful = require('beautiful');
 
 -- MODKEY
 modkey = 'Mod4'
@@ -80,9 +81,11 @@ local key_bindings = gears.table.join({
     if bar_visibility[screen_idx] == true then
       root.elements.topbar.hide(screen_idx)
       bar_visibility[screen_idx] = false
+      beautiful.useless_gap = 0
     else
       root.elements.topbar.show(screen_idx)
       bar_visibility[screen_idx] = true
+      beautiful.useless_gap = 3
     end
   end),
 

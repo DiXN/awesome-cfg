@@ -24,7 +24,7 @@ root.elements = root.elements or {}
 
 -- THEME
 beautiful.useless_gap = 3
-beautiful.border_width = 3
+beautiful.border_width = 0
 
 -- MODKEY
 modkey = 'Mod4'
@@ -295,12 +295,17 @@ for i = 0, 9 do
         role    = {
           "AlarmWindow",
           "ConfigManager",
-          "pop-up",
+          "pop-up"
+        },
+        type = {
+          "dialog"
         }
       },
       properties = {
         raise = true,
         floating = true,
+        above = true,
+        ontop = true,
         placement = awful.placement.centered
       }
     }
@@ -407,6 +412,10 @@ for i = 0, 9 do
 
   client.connect_signal("manage", function(c)
     if bottom then awful.client.setslave(c) end
+
+    c.shape = function(cr,w,h)
+      gears.shape.rounded_rect(cr, w, h, 6)
+    end
 
     c:emit_signal("client_change")
   end)
