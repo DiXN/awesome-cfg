@@ -7,7 +7,6 @@ local config = require('helpers.config');
 local beautiful = require('beautiful');
 local rounded = require('helpers.rounded');
 local xrdb = beautiful.xresources.get_current_theme();
-local inspect = require('inspect')
 local bling = require("bling")
 
 local playerctl = bling.signal.playerctl.lib {
