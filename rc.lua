@@ -501,6 +501,7 @@ for i = 0, 9 do
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
+  awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
   awful.spawn.with_shell("nm-applet &");
   awful.spawn.with_shell('instantmouse 0.19500');
   awful.spawn.with_shell("numlockx");
