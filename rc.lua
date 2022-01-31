@@ -478,7 +478,7 @@ for i = 0, 9 do
       local client_tag = c.first_tag
       local current_tag = awful.screen.focused().selected_tag
 
-      if client_tag ~= current_tag then
+      if client_tag and client_tag ~= current_tag then
         client_tag:view_only()
       end
     end
