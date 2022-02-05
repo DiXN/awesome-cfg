@@ -63,7 +63,6 @@ if not root.elements.topbar then require('elements.topbar')() end;
 if not root.elements.tagswitcher then require('elements.tagswitch')() end;
 if not root.elements.powermenu then require('elements.powermenu')() end;
 
-local last_client = nil;
 local bottom = true;
 
 for _, key in ipairs(key_bindings) do
@@ -72,14 +71,15 @@ end
 
 awful.keygrabber {
   keybindings = {
-    {{ modkey }, 'r', function() last_client = client.focus end}
+    {{ modkey }, 'r', function() awful.client.object.last_client = client.focus end}
   },
   stop_key           = modkey,
   stop_event         = 'release',
   stop_callback      = function()
-    if last_client ~= nil then
-      client.focus:swap(last_client)
-      client.focus = last_client
+    local c = awful.client.object
+    if c.last_client ~= nil then
+      client.focus:swap(c.last_client)
+      client.focus = c.last_client
     end;
   end,
   export_keybindings = true,

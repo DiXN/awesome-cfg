@@ -59,6 +59,16 @@ function reset_fullscreen()
   end
 end
 
+function killall_clients()
+  local t = awful.screen.focused().selected_tag
+
+  if t ~= nil then
+    for _, c in ipairs(t:clients()) do
+      c:kill()
+    end
+  end
+end
+
 --GLOBAL KEYBINDS/BUTTONS
 local key_bindings = gears.table.join({
   awful.key({ modkey }, "Return", function() awful.spawn(config.commands.terminal) end),
@@ -74,6 +84,7 @@ local key_bindings = gears.table.join({
   awful.key({ modkey, "Shift" }, "l", function() if root.elements.powermenu then root.elements.powermenu.lock() end end),
   -- awful.key({ modkey, "Shift" }, "r", function() if root.elements.powermenu then root.elements.powermenu.lock(awesome.restart) end end),
   awful.key({ modkey, "Shift" }, "r", awesome.restart),
+  awful.key({ modkey }, "a", killall_clients),
 
   awful.key({ modkey, "Shift"}, "b", function()
     local screen_idx = awful.screen.focused().index
@@ -113,7 +124,6 @@ local key_bindings = gears.table.join({
 
   awful.key({ modkey }, "m", function() awful.layout.set(awful.layout.suit.max) end),
   awful.key({ modkey }, "t", function() awful.layout.set(awful.layout.suit.tile) end),
-  awful.key({ modkey }, "a", function() awful.spawn("instantassist") end),
   awful.key({ modkey }, "v", function() root.elements.hub.enable_view_by_index(5, mouse.screen) end),
 
   -- Screenshot
