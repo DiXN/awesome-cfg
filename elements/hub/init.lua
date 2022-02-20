@@ -101,15 +101,8 @@ function make_view(i, t, v, a)
 end
 
 function make_nav()
-  local navbg = gears.color({
-    type = 'linear',
-    from = { 0, 0 },
-    to = { config.hub.nw, config.hub.h },
-    stops = { { 0, config.colors.x4 }, { 1, config.colors.x12 } }
-  });
-
   local nav = wibox.container.background();
-  nav.bg = navbg;
+  nav.bg = config.colors.b;
   nav.forced_width = config.hub.nw;
 
   local user = wibox.widget.textbox("");

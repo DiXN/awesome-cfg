@@ -24,7 +24,7 @@ return function()
   ));
 
   local graph = wibox.container.background();
-  graph.bg = config.colors.f;
+  graph.bg = config.colors.b;
   graph.shape = rounded();
   graph.forced_height = 200;
   graph.forced_width = config.hub.w - config.hub.nw - (config.global.m*2);
@@ -152,7 +152,7 @@ return function()
   };
 
   local pac = wibox.container.background();
-  pac.bg = config.colors.x12;
+  pac.bg = config.colors.x1;
   pac.fg = config.colors.w;
   pac.shape = rounded();
   pac:buttons(gears.table.join(
@@ -177,7 +177,7 @@ return function()
   };
 
   local proc = wibox.container.background();
-  proc.bg = config.colors.f;
+  proc.bg = config.colors.b;
   proc.shape = rounded();
 
   local proc_text = wibox.widget.textbox();

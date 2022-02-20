@@ -49,7 +49,7 @@ return function()
     },
     widget_template = {
       layout = wibox.container.background,
-      bg = config.colors.f,
+      bg = config.colors.b,
       shape = rounded(),
       {
         layout = wibox.container.margin,

@@ -63,7 +63,7 @@ return function()
   ));
 
   local monitors = wibox.container.background();
-  monitors.bg = config.colors.f;
+  monitors.bg = config.colors.t;
   monitors.shape = rounded();
 
   local layout = wibox.layout.flex.horizontal();
@@ -90,7 +90,7 @@ return function()
       layout = wibox.container.background,
       forced_height = 100,
       forced_width = 50,
-      bg = config.colors.f,
+      bg = config.colors.b,
       fg = config.colors.w,
       shape = rounded(),
       {
@@ -104,7 +104,7 @@ return function()
     }
 
     add:connect_signal("mouse::enter", function(el) el:get_children_by_id("bg")[1].bg = config.colors.xf end);
-    add:connect_signal("mouse::leave", function(el) el:get_children_by_id("bg")[1].bg = config.colors.f end);
+    add:connect_signal("mouse::leave", function(el) el:get_children_by_id("bg")[1].bg = config.colors.b end);
 
     return add
   end
@@ -169,7 +169,7 @@ return function()
         layout = wibox.layout.fixed.vertical,
         {
           layout = wibox.container.background,
-          bg = config.colors.f,
+          bg = config.colors.b,
           shape = rounded(),
           forced_height = (config.global.m*6) + config.global.slider,
           {

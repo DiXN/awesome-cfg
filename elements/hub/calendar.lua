@@ -25,7 +25,7 @@ return function()
   ));
 
   local cal_container = wibox.container.background();
-  cal_container.bg = config.colors.f;
+  cal_container.bg = config.colors.b;
   cal_container.shape = rounded();
   cal_container.forced_width = config.hub.w - config.hub.nw - (config.global.m*2);
   cal_container.forced_height = config.hub.w - config.hub.nw - (config.global.m*2);

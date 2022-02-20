@@ -93,7 +93,7 @@ return function()
   play.font = config.fonts.txxlb;
   play.text = config.icons.play;
   play:connect_signal('mouse::enter', function()
-    play.markup = '<span foreground="'..config.colors.x4..'">'..play.text..'</span>';
+    play.markup = '<span foreground="'..config.colors.w..'">'..play.text..'</span>';
   end);
   play:connect_signal('mouse::leave', function()
     play.text = play.text;
@@ -103,7 +103,7 @@ return function()
   next.font = config.fonts.txxlb;
 
   next:connect_signal('mouse::enter', function()
-    next.markup = '<span foreground="'..config.colors.x4..'">'..next.text..'</span>';
+    next.markup = '<span foreground="'..config.colors.w..'">'..next.text..'</span>';
   end);
 
   next:connect_signal('mouse::leave', function()
@@ -114,7 +114,7 @@ return function()
   prev.font = config.fonts.txxlb;
 
   prev:connect_signal('mouse::enter', function()
-    prev.markup = '<span foreground="'..config.colors.x4..'">'..prev.text..'</span>';
+    prev.markup = '<span foreground="'..config.colors.w..'">'..prev.text..'</span>';
   end);
 
   prev:connect_signal('mouse::leave', function()
@@ -253,7 +253,7 @@ return function()
       },
       {
         layout = wibox.container.background,
-        bg = config.colors.f,
+        bg = config.colors.b,
         shape = rounded(),
         {
           layout = wibox.layout.fixed.vertical,
@@ -304,7 +304,7 @@ return function()
         {
           layout = wibox.container.background,
           shape = rounded(),
-          bg = config.colors.f,
+          bg = config.colors.b,
           forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
           {
             layout = wibox.container.margin,

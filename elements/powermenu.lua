@@ -209,13 +209,6 @@ function make_button(i,t)
 end
 
 function make_powermenu()
-  local panelbg = gears.color({
-    type = 'linear',
-    from = { 0, 0 },
-    to = { config.powermenu.w, config.powermenu.hh },
-    stops = { { 0, config.colors.x4 }, { 1, config.colors.x12 } }
-  });
-
   local splash = {};
 
   awful.screen.connect_for_each_screen(function(s)
@@ -287,7 +280,7 @@ function make_powermenu()
       layout = wibox.layout.fixed.vertical,
       {
         layout = wibox.container.background,
-        bg = panelbg,
+        bg = config.colors.b,
         {
           layout = wibox.container.margin,
           bottom = config.global.m*2,

@@ -14,7 +14,7 @@ function make_connection(t, n)
   container.forced_width = config.hub.w - config.hub.nw - (config.global.m*2);
 
   local conx = wibox.container.background();
-  conx.bg = config.colors.f;
+  conx.bg = config.colors.b;
   conx.shape = rounded();
   conx.fg = config.colors.xf;
 
