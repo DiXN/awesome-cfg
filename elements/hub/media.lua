@@ -147,6 +147,18 @@ return function()
   local media_progress = wibox.container.background()
   media_progress.bg = config.colors.x1
 
+  local media_container = wibox.widget {
+    layout = wibox.container.background,
+    shape = rounded(),
+    bg = config.colors.b,
+    forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
+    {
+      layout = wibox.container.margin,
+      margins = config.global.m,
+      spotify
+    }
+  }
+
   local function player_exit()
     play.text = config.icons.play
     spotify_title.text = 'Nothing playing'
@@ -161,6 +173,12 @@ return function()
     local max_width = (config.hub.w - config.hub.nw) - (config.global.m*2)
     local current_progress = math.floor(interval / length * max_width)
     media_progress.forced_width = current_progress
+
+    if length > 0 then
+      media_container.bg = config.colors.b .. '98'
+    else
+      media_container.bg = config.colors.b
+    end
   end)
 
   playerctl:connect_signal("metadata", function(_, title, artist, album_path, album, new, player_name)
@@ -301,17 +319,7 @@ return function()
             media_progress
           }
         },
-        {
-          layout = wibox.container.background,
-          shape = rounded(),
-          bg = config.colors.b,
-          forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
-          {
-            layout = wibox.container.margin,
-            margins = config.global.m,
-            spotify
-          }
-        },
+        media_container,
         layout = wibox.layout.stack
       },
       id ="view_background_role"
