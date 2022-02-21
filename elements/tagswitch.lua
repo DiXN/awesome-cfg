@@ -112,7 +112,7 @@ function make_taglist(s)
     filter = awful.widget.taglist.filter.all,
     style = {
       fg_focus = config.colors.w,
-      bg_focus = config.colors.x4,
+      bg_focus = config.colors.x1,
       shape_focus = rounded(),
     },
     widget_template = {

@@ -12,7 +12,7 @@ local config = {
     user = gears.filesystem.get_configuration_dir()..'/user.png',
   },
   colors = {
-    b = '#333538',
+    b = '#1f2026',
     t = '#00000000',
     w = '#fefefe',
     f = '#5a666d96',
