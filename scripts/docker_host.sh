@@ -5,8 +5,6 @@ shopt -s nocasematch
 
 
 if [[ -f /.dockerenv && ! -f "/tmp/docker_run" ]]; then
-  loginctl enable-linger "$USER"
-
   echo "XDG_RUNTIME_DIR=/run/user/1000" | sudo tee -a /etc/environment
 
   # DISABLE GPU for Alacritty
