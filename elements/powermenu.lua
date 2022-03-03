@@ -166,8 +166,18 @@ function hide()
     root.elements.powermenu.splash[s.index].visible = false;
   end;
 
-  if root.elements.topbar then root.elements.topbar.show() end;
-  awful.screen.focus(mouse.screen or screen.primary);
+  local s = awful.screen.focused()
+  local t = s.selected_tag
+
+  if root.elements.topbar then
+    local t_bar = root.elements.topbar
+
+    if t_bar.visibility[s.index][t.index] == true then
+      t_bar.show()
+    end
+  end;
+
+  awful.screen.focus(s or screen.primary);
 
   if mouse.current_client and not awful.client.focus then
     awful.client.focus = mouse.current_client;

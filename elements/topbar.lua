@@ -609,8 +609,27 @@ function setup_bar()
 
   root.elements.topbar = {
     show = show,
-    hide = hide
+    hide = hide,
+    visibility = {},
+    visibility_toggle
   }
+end
+
+local function toggle()
+  local screen_idx = awful.screen.focused().index
+  local tag_idx = awful.screen.focused().selected_tag.index
+
+  local t_bar = root.elements.topbar
+
+  if t_bar.visibility[screen_idx][tag_idx] == true then
+    t_bar.hide(screen_idx)
+    t_bar.visibility[screen_idx][tag_idx] = false
+    beautiful.useless_gap = 0
+  else
+    t_bar.show(screen_idx)
+    t_bar.visibility[screen_idx][tag_idx] = true
+    beautiful.useless_gap = 3
+  end
 end
 
 function show(idx)
@@ -645,5 +664,28 @@ return function()
   root.elements.topbar.tasklist = get_tasklist;
   root.elements.topbar.show = show;
   root.elements.topbar.hide = hide;
+  root.elements.topbar.visibility_toggle = toggle;
+
+  awful.screen.connect_for_each_screen(function(s)
+    root.elements.topbar.visibility[s.index] = {}
+
+    for t in ipairs(s.tags) do
+      root.elements.topbar.visibility[s.index][t] = true
+    end
+
+    -- Check if topbar is hidden on this tag.
+    awful.tag.attached_connect_signal(s, "property::selected", function(t)
+      local t_bar = root.elements.topbar
+      if t_bar.visibility[s.index][t.index] == nil then t_bar.visibility[s.index][t.index] = true end
+
+      if t_bar.visibility[s.index][t.index] == true then
+        t_bar.show(s.index)
+        beautiful.useless_gap = 3
+      else
+        t_bar.hide(s.index)
+        beautiful.useless_gap = 0
+      end
+    end)
+  end)
 end
 

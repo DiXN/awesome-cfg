@@ -9,9 +9,6 @@ alt = 'Mod1'
 
 local vol_timer = nil
 
-local bar_visibility = {};
-awful.screen.connect_for_each_screen(function(s) bar_visibility[s.index] = true end);
-
 local function init_vol_timer()
   vol_timer = gears.timer {
     timeout   = 2,
@@ -86,19 +83,7 @@ local key_bindings = gears.table.join({
   awful.key({ modkey, "Shift" }, "r", awesome.restart),
   awful.key({ modkey }, "a", killall_clients),
 
-  awful.key({ modkey, "Shift"}, "b", function()
-    local screen_idx = awful.screen.focused().index
-
-    if bar_visibility[screen_idx] == true then
-      root.elements.topbar.hide(screen_idx)
-      bar_visibility[screen_idx] = false
-      beautiful.useless_gap = 0
-    else
-      root.elements.topbar.show(screen_idx)
-      bar_visibility[screen_idx] = true
-      beautiful.useless_gap = 3
-    end
-  end),
+  awful.key({ modkey, "Shift"}, "b", function() root.elements.topbar.visibility_toggle() end),
 
   awful.key({ modkey }, "j", function()
     reset_fullscreen()
