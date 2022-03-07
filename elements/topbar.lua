@@ -611,7 +611,8 @@ function setup_bar()
     show = show,
     hide = hide,
     visibility = {},
-    visibility_toggle
+    visibility_toggle,
+    visibility_timer
   }
 end
 
@@ -625,10 +626,12 @@ local function toggle()
     t_bar.hide(screen_idx)
     t_bar.visibility[screen_idx][tag_idx] = false
     beautiful.useless_gap = 0
+    if not t_bar.visibility_timer.started then t_bar.visibility_timer:start() end
   else
     t_bar.show(screen_idx)
     t_bar.visibility[screen_idx][tag_idx] = true
     beautiful.useless_gap = 3
+    if t_bar.visibility_timer.started then t_bar.visibility_timer:stop() end
   end
 end
 
@@ -656,6 +659,41 @@ function hide(idx)
   for i in pairs(root.elements.date) do root.elements.layout[idx or i].visible = false end;
 end
 
+function topbar_hover(t_bar)
+  local t_counter = 0
+  -- Toggle topbar visibility on hover.
+  return gears.timer {
+    timeout   = 0.3,
+    callback  = function()
+      local coords = mouse.coords()
+      local s = mouse.screen
+      local s_geo = s.geometry
+      local t = s.selected_tag
+
+      if t_bar.visibility[s.index][t.index] == false then
+        -- Show topbar if mouse is within 3px of the top of the screen.
+        if coords.y < 3 then
+          if t_counter == 2 then
+            t_bar.show(s.index)
+            beautiful.useless_gap = 3
+            t_counter = 0
+          end
+
+          t_counter = t_counter + 1
+        else
+        end
+
+        -- Hide topbar if mouse is outside "config.topbar.h * 3".
+        if coords.y > config.topbar.h * 3 then
+          t_counter = 0
+          t_bar.hide(s.index)
+          beautiful.useless_gap = 0
+        end
+      end
+    end
+  }
+end
+
 return function()
   setup_bar()
 
@@ -663,8 +701,8 @@ return function()
 
   root.elements.topbar.tasklist = get_tasklist;
   root.elements.topbar.show = show;
-  root.elements.topbar.hide = hide;
   root.elements.topbar.visibility_toggle = toggle;
+  root.elements.topbar.hide = hide;
 
   awful.screen.connect_for_each_screen(function(s)
     root.elements.topbar.visibility[s.index] = {}
@@ -672,6 +710,8 @@ return function()
     for t in ipairs(s.tags) do
       root.elements.topbar.visibility[s.index][t] = true
     end
+
+    root.elements.topbar.visibility_timer = topbar_hover(root.elements.topbar)
 
     -- Check if topbar is hidden on this tag.
     awful.tag.attached_connect_signal(s, "property::selected", function(t)
@@ -687,5 +727,6 @@ return function()
       end
     end)
   end)
+
 end
 
