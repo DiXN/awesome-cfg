@@ -182,7 +182,13 @@ for i = 0, 9 do
   -- CLIENT KEYBINDS & BUTTONS
   client.connect_signal("request::default_keybindings", function(c)
     awful.keyboard.append_client_keybindings({
-      awful.key({ modkey }, "q", function (c) c.kill(c) end),
+      awful.key({ modkey }, "q", function (c)
+        c.kill(c)
+
+        if c.pid and c.class == 'gamescope' then
+          awful.spawn("kill -15 " .. c.pid)
+        end
+      end),
       awful.key({ modkey, "Control" }, "Right", function(c) c:move_to_screen(c.screen.index+1) end),
       awful.key({ modkey, "Control" }, "Left", function(c) c:move_to_screen(c.screen.index-1) end),
       awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
@@ -271,7 +277,7 @@ for i = 0, 9 do
 
     ruled.client.append_rule {
       rule_any = {
-        class = { "brave-browser", "Brave-browser" }
+        class = { "brave-browser", "Brave-browser", "virt-manager", "Virt-manager" }
       },
       properties = {
         fake_full = true
@@ -323,7 +329,7 @@ for i = 0, 9 do
             c.minimized = false
           end
 
-          awful.spawn.with_shell("easyeffects --gapplication-service");
+          awful.spawn.with_shell("systenctl --user restart jack-carla-rack");
 
           function spawn_picom()
             awful.spawn.easy_async_with_shell("pgrep picom", function(o)
@@ -345,7 +351,7 @@ for i = 0, 9 do
             end
           }
 
-          ignored_clients = { "csgo_linux64" }
+          ignored_clients = { "csgo_linux64", "love", "steam_app_311210" }
 
           ignored = false
 
@@ -498,13 +504,13 @@ for i = 0, 9 do
   end)
 
   -- SPAWNS
-  awful.spawn.with_shell("$HOME/.config/awesome/scripts/screen.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
   awful.spawn.with_shell("nm-applet &");
   awful.spawn.with_shell('instantmouse 0.19500');
   awful.spawn.with_shell("numlockx");
+  awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &");
 
   -- IDLE
   awful.spawn.with_line_callback(config.commands.idle, {
