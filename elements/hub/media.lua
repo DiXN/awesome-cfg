@@ -10,7 +10,7 @@ local xrdb = beautiful.xresources.get_current_theme();
 local bling = require("bling")
 
 local playerctl = bling.signal.playerctl.lib {
-  player = { "ncspot", "%any" }
+  player = { "spotifyd", "%any" }
 }
 
 return function()
@@ -81,6 +81,22 @@ return function()
       }
     }
   };
+
+  spotify_icon:connect_signal('mouse::enter', function(self)
+   self.forced_height = 142
+   self.forced_width = 142
+  end)
+
+  spotify_icon:connect_signal('mouse::leave', function(self)
+   self.forced_height = 140
+   self.forced_width = 140
+  end)
+
+  spotify_icon:buttons(
+    awful.button({}, 1, function()
+      awful.spawn.with_shell(config.commands.spotify_play)
+    end)
+  )
 
   local icon = spotify_icon;
 

@@ -48,8 +48,8 @@ elif [[ "$1" == "recommend" ]]; then
       # Check if spotifyd is online and if API request is successfull.
       [[ "$(spt play -q --uri "$URI" 2>&1)" =~ .*[Ee]rror.* ]] && \
         [[ "$(spt play -t --uri "$URI" 2>&1)" =~ .*[Ee]rror.* ]] && \
-          echo "Spotifyd is probably not running." && \
-            notify-send "Spotifyd is probably not running." && exit 1
+          echo "Spotifyd is probably not running. Trying to start it ..." && \
+            spotifyd && sleep 3 && ! [ "$(pgrep spotifyd)" ] && notify-send "Spotifyd is not running. Exiting." && exit 1
 
       echo "Queuing: $NAME"
       notify-send "Queuing: $NAME"

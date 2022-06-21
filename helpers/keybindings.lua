@@ -72,9 +72,9 @@ local key_bindings = gears.table.join({
   awful.key({ modkey }, "c", function() awful.spawn(config.commands.editor) end),
   awful.key({ modkey, alt }, "b", function() awful.spawn(config.commands.browser) end),
   awful.key({ modkey }, "b", function() awful.spawn(config.commands.browser .. " --incognito") end),
-  awful.key({ modkey }, "f", function() awful.spawn(config.commands.files) end),
-  awful.key({ modkey }, "n", function() awful.spawn(config.commands.nvidia) end),
+  awful.key({ modkey }, "n", function() awful.spawn(config.commands.files) end),
   awful.key({ modkey }, "space", function() awful.spawn(config.commands.rofi) end),
+  awful.key({ modkey }, "u", function() awful.spawn(config.commands.kill_spotify) end),
 
   awful.key({ modkey, "Shift" }, "q", function() if root.elements.powermenu then root.elements.powermenu.show() end end),
   awful.key({ modkey, "Control" }, "q", function() awesome.quit() end),
