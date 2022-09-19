@@ -301,7 +301,36 @@ return function()
   end);
 
   awful.widget.watch(config.commands.proccmd, 3, function(w, o)
-    proc_text.text = o:gsub("^%s*(.-)%s*$", "%1");
+    local tokens={}
+    local output = ""
+
+    for token in string.gmatch(o, "[^%s]+") do
+       table.insert(tokens, token)
+    end
+
+
+    local index_reset = 0
+    local first_run = true
+    for key,val in pairs(tokens) do
+
+      if (key - index_reset) % 2 == 0
+      then
+        if first_run then
+          output = output .. "\t\t\t\t\t     " .. val
+        else
+          output = output .. "\t\t\t\t\t\t\t  " .. val .. "\t    "
+        end
+      elseif (key - index_reset) % 3 == 0
+      then
+        index_reset = key
+        first_run = false
+        output = output .. " " .. val .. "\n"
+      else
+        output = output .. "\t" .. val
+      end
+    end
+
+    proc_text.text = output
   end);
 
   awful.widget.watch(config.commands.vol, 2, function(w,o,e,r,c)
