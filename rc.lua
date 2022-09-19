@@ -24,6 +24,7 @@ root.elements = root.elements or {}
 
 -- THEME
 beautiful.useless_gap = 3
+beautiful.gab_single_client = true
 beautiful.border_width = 0
 
 -- MODKEY
@@ -77,6 +78,7 @@ awful.keygrabber {
   stop_event         = 'release',
   stop_callback      = function()
     local c = awful.client.object
+
     if c.last_client ~= nil then
       client.focus:swap(c.last_client)
       client.focus = c.last_client
@@ -236,9 +238,7 @@ for i = 0, 9 do
       awful.button({ modkey, "Shift" }, 3, function (c)
         if not c.minimized then c.minimized = true end
       end),
-      awful.button({ modkey }, 3, function (c)
-        c:activate { context = "mouse_click", action = "mouse_resize" }
-      end),
+      awful.button({ modkey }, 3, awful.mouse.client.resize),
       awful.button({ modkey }, 2, function (c)
         if c.floating then
           c.floating = false
@@ -473,6 +473,12 @@ for i = 0, 9 do
     if c.floating and c.fullscreen == false then
       c.above = true
       c.ontop = true
+    end
+
+    if c.fake_full == false and c.fullscreen then
+      c.shape = function(cr,w,h)
+        gears.shape.rounded_rect(cr, w, h, 0)
+      end
     end
   end)
 
