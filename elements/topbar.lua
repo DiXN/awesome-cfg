@@ -716,9 +716,9 @@ return function()
     -- Check if topbar is hidden on this tag.
     awful.tag.attached_connect_signal(s, "property::selected", function(t)
       local t_bar = root.elements.topbar
-      if t_bar.visibility[s.index][t.index] == nil then t_bar.visibility[s.index][t.index] = true end
+      if t_bar and t_bar.visibility[s.index][t.index] == nil then t_bar.visibility[s.index][t.index] = true end
 
-      if t_bar.visibility[s.index][t.index] == true then
+      if t_bar and t_bar.visibility[s.index][t.index] == true then
         t_bar.show(s.index)
         beautiful.useless_gap = 3
       else
