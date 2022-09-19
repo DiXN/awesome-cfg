@@ -35,6 +35,15 @@ function unlock(pwd)
   end
 end
 
+local hooks = {
+  {{ }, 'Escape', function(_)
+    prompt()
+  end},
+  {{ 'Control' }, 'c', function(_)
+    prompt()
+  end},
+}
+
 function prompt()
   local box = wibox.widget.textbox();
 
@@ -43,9 +52,9 @@ function prompt()
     font = config.fonts.txlb,
     textbox = box,
     exe_callback = unlock,
-    done_callback = reset,
     highlighter = mask,
     prompt = '',
+    hooks = hooks
   }
 
   if root.elements.powermenu.prompt then
@@ -88,31 +97,14 @@ function lock(cb)
     end
   end
 
-  -- Setup hover/click state for lock icon
-  if root.elements.powermenu.icon_lock then
-    root.elements.powermenu.icon_lock:connect_signal("mouse::enter", function()
-      root.elements.powermenu.icon_lock.children[1].text = config.icons.unlock;
-      root.elements.powermenu.icon_lock.children[2].text = 'unlock';
-      root.elements.powermenu.icon_lock.children[2].visible = true;
-    end);
-    root.elements.powermenu.icon_lock:connect_signal("mouse::leave", function()
-      root.elements.powermenu.icon_lock.children[1].text = config.icons.lock;
-      root.elements.powermenu.icon_lock.children[2].text = 'lock';
-      root.elements.powermenu.icon_lock.children[2].visible = false;
-    end);
-    root.elements.powermenu.icon_lock:buttons(gears.table.join(
-      awful.button({}, 1, function()
-        if root.elements.powermenu.prompt then prompt() end
-      end)
-    ));
-  end
-
+  if root.elements.powermenu.prompt then prompt() end
 end
 
 
 function show()
   if root.elements.powermenu.open then return end;
   root.elements.powermenu.open = true;
+  reset()
 
   -- Show splash screen and add panel to mouse screen
   for _,s in pairs(root.elements.powermenu.splash) do s.visible = true end
