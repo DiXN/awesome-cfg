@@ -23,7 +23,9 @@ function make_mon(wall, id)
     forced_height = mon_size.h,
     fg = config.colors.w,
   }
-  monitor:set_image(gears.surface.load_uncached(gears.filesystem.get_configuration_dir()..wall));
+
+  monitor:set_image(gears.surface.load_uncached(gears.filesystem.get_configuration_dir() .. wall));
+
   return wibox.widget {
     layout = wibox.layout.stack,
     forced_width = mon_size.w,
@@ -213,14 +215,9 @@ return function()
               },
               {
                 layout = wibox.layout.flex.horizontal,
-                layout_button("idle", function()
-                  awful.spawn(gears.filesystem.get_xdg_config_home() .. 'instantos/quickmenu/idle')
-                end),
-                layout_button("full", function()
-                  awful.spawn(gears.filesystem.get_xdg_config_home() .. 'instantos/quickmenu/full')
-                end),
-                layout_button("snd", function() awful.spawn.with_shell(config.commands.secondary) end),
-                layout_button("s&t", function() awful.spawn.with_shell(config.commands.secondthird) end)
+                layout_button("idle", function() awful.spawn.with_shell(config.commands.dispidle) end),
+                layout_button("full", function() awful.spawn.with_shell(config.commands.dispfull) end),
+                layout_button("snd", function() awful.spawn.with_shell(config.commands.dispsecondary) end),
               }
             }
           },
