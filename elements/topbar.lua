@@ -8,6 +8,7 @@ local rounded = require('helpers.rounded');
 local gfs = require('gears.filesystem')
 local themes_path = gfs.get_themes_dir()
 local xrdb = beautiful.xresources.get_current_theme();
+local dpi = beautiful.xresources.apply_dpi
 
 root.elements = root.elements or {};
 
@@ -214,19 +215,19 @@ function make_tray(s)
     local width = 1
 
     if num_entries == 1 then beautiful.systray_icon_spacing = 0  else beautiful.systray_icon_spacing = 5 end
-    if num_entries >= 1 then width = num_entries * 32 end
+    if num_entries > 1 then width = dpi(num_entries * 32) else width = dpi(35) end
 
     tray.width = width
     tray:struts({ top = config.topbar.h + config.global.m });
 
     tray.x = ((s.workarea.width - (config.topbar.w + (config.global.m*2))) + s.workarea.x)
-      - config.topbar.dw - 10 - tray.width - 40;
+      - config.topbar.dw - dpi(10) - tray.width - dpi(40);
 
     tray.y = config.global.m;
 
     -- Update tasklist_r width
-    local width_r = (s.workarea.width / 2) - 310
-      - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) - num_entries * 32 + (uw_scaling_factor(s) * 2);
+    local width_r = (s.workarea.width / 2) - dpi(310)
+      - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) - dpi(num_entries * 32) + (uw_scaling_factor(s) * 2);
 
     root.elements.tasklist[s.index][2].width = width_r
   end)
@@ -295,7 +296,7 @@ function make_utilities(s)
   if config.topbar.utilities.mem or config.topbar.utilities.pac or config.topbar.utilities.bat or config.topbar.utilities.note then
     local sep = wibox.widget.textbox('|');
     sep.opacity = 0.2;
-    sep.forced_width = 20;
+    sep.forced_width = dpi(20);
     sep.font = config.fonts.m..' 14';
     sep.forced_height = config.topbar.h;
     layout:add(sep);;
@@ -445,7 +446,7 @@ function make_tasklist(s)
   )
 
 
-  local uw = config.global.m-4;
+  local uw = config.global.m - dpi(4);
   local width = (s.workarea.width / 2) - (config.topbar.w) - uw / 2 - config.global.m * 36 + (uw_scaling_factor(s) * 2);
 
   local tasklist = wibox({
@@ -462,7 +463,7 @@ function make_tasklist(s)
   -- Create layoutbox already to get offset
   make_layoutbox(s)
 
-  local width_r = (s.workarea.width / 2) - 310
+  local width_r = (s.workarea.width / 2) - dpi(310)
     - (s.workarea.width - root.elements.layout[s.index].x + s.workarea.x) + (uw_scaling_factor(s) * 2);
 
   local tasklist_r = wibox({

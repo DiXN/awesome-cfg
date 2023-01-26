@@ -7,6 +7,7 @@ local beautiful = require('beautiful');
 local xrdb = beautiful.xresources.get_current_theme();
 local config = require('helpers.config');
 local awful = require('awful');
+local dpi = beautiful.xresources.apply_dpi
 
 function toggle_tag_switcher()
   awful.screen.focused().tagswitch.visible = not awful.screen.focused().tagswitch.visible;
@@ -29,8 +30,8 @@ function add_new_tag()
 
   local stags = awful.screen.focused().tags;
   local switcher = awful.screen.focused().tagswitch;
-  switcher.width = ((100+config.global.m) * (#stags+1)) + config.global.m;
-  switcher.x = switcher.x - 55;
+  switcher.width = ((dpi(100) + config.global.m) * (#stags+1)) + config.global.m;
+  switcher.x = switcher.x - dpi(55);
 end
 
 function delete_tag(t)
@@ -39,7 +40,7 @@ function delete_tag(t)
   local switcher = awful.screen.focused().tagswitch;
   switcher.width = ((100+config.global.m) * (#stags+1)) + config.global.m;
   if(#stags == 1) then return end;
-  switcher.x = switcher.x + 55;
+  switcher.x = switcher.x + dpi(55);
 end
 
 function popup(s)
@@ -66,8 +67,8 @@ function popup(s)
           widget  = wibox.container.margin,
         },
         id              = 'background_role',
-        forced_width    = 128,
-        forced_height   = 128,
+        forced_width    = dpi(128),
+        forced_height   = dpi(128),
         bg     = '#ff00ff',
         widget          = wibox.container.background,
         create_callback = function(self, c, index, objects) --luacheck: no unused
@@ -87,7 +88,7 @@ function popup(s)
 end
 
 function make_taglist(s)
-  local w = ((100+config.global.m) * (#s.tags+1)) + config.global.m;
+  local w = ((dpi(100) + config.global.m) * (#s.tags+1)) + config.global.m;
   local container = wibox({
     height = config.tagswitcher.h,
     width = w,
@@ -121,8 +122,8 @@ function make_taglist(s)
         layout = wibox.container.background,
         bg = config.colors.f,
         shape = rounded(),
-        forced_width = 100,
-        forced_height = 100,
+        forced_width = dpi(100),
+        forced_height = dpi(100),
         {
           id = "text_role",
           widget = wibox.widget.textbox,
@@ -136,8 +137,8 @@ function make_taglist(s)
 
   local add = wibox.container.background();
   add.bg = config.colors.f;
-  add.forced_height = 100;
-  add.forced_width = 100;
+  add.forced_height = dpi(100);
+  add.forced_width = dpi(100);
   add.shape = rounded();
   add:buttons(gears.table.join(
     awful.button({ 'Mod4' }, 1, add_new_tag)

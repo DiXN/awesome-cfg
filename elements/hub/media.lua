@@ -8,6 +8,7 @@ local beautiful = require('beautiful');
 local rounded = require('helpers.rounded');
 local xrdb = beautiful.xresources.get_current_theme();
 local bling = require("bling")
+local dpi = beautiful.xresources.apply_dpi
 
 local playerctl = bling.signal.playerctl.lib {
   player = { "spotifyd", "%any" }
@@ -60,15 +61,15 @@ return function()
 
   local album_icon = wibox.widget.imagebox();
   album_icon.clip_shape = rounded();
-  album_icon.forced_height = 140;
-  album_icon.forced_width = 140;
+  album_icon.forced_height = dpi(140);
+  album_icon.forced_width = dpi(140);
   album_icon.resize = true;
 
   local spotify_icon = wibox.widget {
     layout = wibox.container.background,
     bg = config.colors.w,
-    forced_height = 140,
-    forced_width = 140,
+    forced_height = dpi(140),
+    forced_width = dpi(140),
     shape = rounded(),
     {
       layout = wibox.container.place,
@@ -83,13 +84,13 @@ return function()
   };
 
   spotify_icon:connect_signal('mouse::enter', function(self)
-   self.forced_height = 142
-   self.forced_width = 142
+   self.forced_height = dpi(142)
+   self.forced_width = dpi(142)
   end)
 
   spotify_icon:connect_signal('mouse::leave', function(self)
-   self.forced_height = 140
-   self.forced_width = 140
+   self.forced_height = dpi(140)
+   self.forced_width = dpi(140)
   end)
 
   spotify_icon:buttons(
@@ -328,7 +329,7 @@ return function()
         {
           layout = wibox.container.background,
           shape = rounded(),
-          forced_height = 140 + config.global.m, -- cannot be computed (album_icon + config.global.m)
+          forced_height = dpi(140) + config.global.m, -- cannot be computed (album_icon + config.global.m)
           forced_width = (config.hub.w - config.hub.nw) - (config.global.m*2),
           {
             layout = wibox.layout.fixed.horizontal,

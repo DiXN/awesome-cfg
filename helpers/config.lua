@@ -1,14 +1,15 @@
 local gears = require('gears');
 local awful = require('awful');
 local beautiful = require('beautiful');
+local dpi = beautiful.xresources.apply_dpi
 local xrdb = beautiful.xresources.get_current_theme();
 
 local config = {
   global = {
-    m = 10,
-    r = 7,
-    o = 0.35,
-    slider = 30,
+    m = dpi(10),
+    r = dpi(7),
+    o = dpi(0.35),
+    slider = dpi(30),
     user = gears.filesystem.get_configuration_dir()..'/user.png',
   },
   colors = {
@@ -58,15 +59,15 @@ local config = {
     i = "Material Design Icons Desktop ",
   },
   powermenu = {
-    w = 500,
-    h = 330,
-    hh = 230,
-    a = 100,
+    w = dpi(500),
+    h = dpi(330),
+    hh = dpi(230),
+    a = dpi(100),
   },
   topbar = {
-    h = 30,
-    w = 30,
-    dw = 275,
+    h = dpi(30),
+    w = dpi(30),
+    dw = dpi(275),
     utilities = {
       wifi = false,
       bt = true,
@@ -79,14 +80,14 @@ local config = {
       bat = false,
     },
   },
-  tagswitcher= {
-    h = 120,
+  tagswitcher = {
+    h = dpi(120),
   },
   hub = {
-    i = 40,
-    w = 800,
-    h = 600,
-    nw = 260,
+    i = dpi(40),
+    w = dpi(800),
+    h = dpi(600),
+    nw = dpi(260),
   },
   icons = {
     arch = '󰣇',
@@ -170,8 +171,8 @@ local config = {
     files = "nautilus",
     spotify = "spotify",
     nvidia = "nvidia-settings",
-    rofi = "rofi -show drun -theme global",
-    rofi2 = "rofi -show drun -theme launcher",
+    rofi = "rofi -show drun -dpi 1 -theme global",
+    rofi2 = "rofi -show drun -dpi 1 -theme launcher",
     software = "pamac-manager",
     pause = "playerctl --player=spotifyd,%any play-pause",
     play = "playerctl --player=spotifyd,%any play-pause",
@@ -194,10 +195,10 @@ local config = {
     switch_inputs = gears.filesystem.get_configuration_dir()..'scripts/hotplug_wrapper.sh'..' add',
   },
   notifications = {
-    w = 200,
+    w = dpi(200),
   },
   display = {
-    sw = 120,
+    sw = dpi(120),
   },
   media = {
     nowplaying = nil,

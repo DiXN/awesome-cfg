@@ -13,8 +13,8 @@ GLX_INFO=$(glxinfo -B)
 ACCELERATED=$(echo "$GLX_INFO" | awk '/Accelerated:/{ print $2 }')
 
 if [ "$ACCELERATED" = "yes" ] || echo "$GLX_INFO" | grep -q 'OpenGL vendor string: NVIDIA Corporation'; then
-  picom --experimental-backends --config "$HOME/.config/picom/conf"
+  picom --config "$HOME/.config/picom/conf"
  else
-  picom --experimental-backends --backend xrender --config "$HOME/.config/picom/conf"
+  picom --backend xrender --config "$HOME/.config/picom/conf"
 fi
 
