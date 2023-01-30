@@ -205,7 +205,7 @@ return function()
     bat_progress.value = 0;
 
     bat_value = wibox.widget.textbox();
-    bat_value.font = config.fonts.txxlb;
+    bat_value.font = config.fonts.il;
     bat_value.align = "center";
     bat_value.valign = "center";
     bat_value.visible = false;

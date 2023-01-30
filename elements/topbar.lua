@@ -114,9 +114,9 @@ function make_date(s)
     valign = "center",
     {
       widget = wibox.widget.textclock,
-      font = config.fonts.tlb;
+      font = config.fonts.is;
       refresh = 1,
-      format = config.icons.date..' %a, %b %-d  <span font="'..config.fonts.tll..'">'..config.icons.time..' %-H:%M:%S </span>';
+      format = config.icons.time .. '<span font="'..config.fonts.tll..'"> %-H:%M:%S </span>';
     },
   };
 
@@ -484,7 +484,7 @@ function make_tasklist(s)
   tasklist.y = config.global.m;
 
   tasklist_r:struts({ top = config.topbar.h + config.global.m });
-  tasklist_r.x = s.workarea.x + (s.workarea.width / 2) + (config.topbar.dw) - config.topbar.w * 2 - config.global.m - uw_scaling_factor(s);
+  tasklist_r.x = s.workarea.x + (s.workarea.width / 2) + (config.topbar.dw) + (config.topbar.dw / 2) - uw_scaling_factor(s);
   tasklist_r.y = config.global.m;
 
   beautiful.tasklist_bg_normal = config.colors.w .. '60';
@@ -706,6 +706,14 @@ return function()
   root.elements.topbar.hide = hide;
 
   awful.screen.connect_for_each_screen(function(s)
+    -- Add padding for TV.
+    if s.outputs['HDMI-A-2'] and s.geometry.width == 3840 and s.geometry.height == 2160 then
+      s.padding = {
+        top = 200,
+        bottom = 200,
+      }
+    end
+
     root.elements.topbar.visibility[s.index] = {}
 
     for t in ipairs(s.tags) do

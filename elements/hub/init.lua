@@ -20,7 +20,6 @@ end
 function enable_view_by_index(i, s, loc)
   if root.elements.hub_views[i] then
     close_views();
-
     root.elements.hub_views[i].view.visible = true;
     root.elements.hub_views[i].title.font = config.fonts.tlb;
 

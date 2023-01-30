@@ -187,7 +187,7 @@ function make_button(i,t)
     {
       widget = wibox.widget.textbox,
       text = i,
-      font = config.fonts.txxlb,
+      font = config.fonts.il,
       align = 'center',
       valign = 'center',
     },

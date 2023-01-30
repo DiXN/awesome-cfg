@@ -11,7 +11,7 @@ local bling = require("bling")
 local dpi = beautiful.xresources.apply_dpi
 
 local playerctl = bling.signal.playerctl.lib {
-  player = { "spotifyd", "%any" }
+  player = { "nuclear", "%any" }
 }
 
 return function()
@@ -32,8 +32,10 @@ return function()
   ));
   view.close = close
 
+  local vol_font_size = (dpi(13) * 0.88)
+
   local vol_heading = wibox.widget.textbox('Volume');
-  vol_heading.font = config.fonts.tlb;
+  vol_heading.font = config.fonts.d .. vol_font_size;
 
   local vol_footer = wibox.widget.textbox('test');
   vol_footer.font = config.fonts.tsl;
@@ -57,7 +59,7 @@ return function()
   end);
 
   local mute = wibox.widget.textbox();
-  mute.font = config.fonts.tlb;
+  mute.font = config.fonts.i .. vol_font_size;
 
   local album_icon = wibox.widget.imagebox();
   album_icon.clip_shape = rounded();
@@ -106,18 +108,22 @@ return function()
   spotify_message.font = config.fonts.tml;
   spotify_title.font = config.fonts.tlb;
 
+  local playback_font = config.fonts.i .. '28'
+
   local play = wibox.widget.textbox();
-  play.font = config.fonts.txxlb;
+  play.font = playback_font;
   play.text = config.icons.play;
+
   play:connect_signal('mouse::enter', function()
     play.markup = '<span foreground="'..config.colors.w..'">'..play.text..'</span>';
   end);
+
   play:connect_signal('mouse::leave', function()
     play.text = play.text;
   end);
 
   local next = wibox.widget.textbox(config.icons.next);
-  next.font = config.fonts.txxlb;
+  next.font = playback_font;
 
   next:connect_signal('mouse::enter', function()
     next.markup = '<span foreground="'..config.colors.w..'">'..next.text..'</span>';
@@ -128,7 +134,7 @@ return function()
   end);
 
   local prev = wibox.widget.textbox(config.icons.prev);
-  prev.font = config.fonts.txxlb;
+  prev.font = playback_font;
 
   prev:connect_signal('mouse::enter', function()
     prev.markup = '<span foreground="'..config.colors.w..'">'..prev.text..'</span>';
@@ -241,11 +247,11 @@ return function()
     awful.spawn.easy_async_with_shell(config.commands.ismuted, function(o,e,r,c)
       if c == 0 then
         vol_slider.bar_active_color = config.colors.b..'26';
-        vol_heading.markup = 'Volume <span font="'..config.fonts.tll..'">(muted)</span>';
+        vol_heading.markup = 'Volume <span font="'..config.fonts.dl..vol_font_size..'">(muted)</span>';
         mute.text = config.icons.vol_mute
       else
         vol_slider.bar_active_color = config.colors.w;
-        vol_heading.markup = 'Volume: <span font="'..config.fonts.tll..'">'..vol_slider.value..'</span>';
+        vol_heading.markup = 'Volume: <span font="'..config.fonts.dl..vol_font_size..'">'..vol_slider.value..'</span>';
         mute.text = config.icons.vol_1
       end;
     end);
@@ -255,7 +261,7 @@ return function()
     local temp_vol = vol_slider.value;
 
     awful.spawn.easy_async_with_shell(config.commands.audiosrc, function(o)
-      if o then vol_footer.markup = 'Output: <span font="'..config.fonts.tsb..'">'..o:gsub("^%s*(.-)%s*$", "%1")..'</span>' end;
+      if o then vol_footer.markup = 'Output: <span font="'..config.fonts.d..'10">'..o:gsub("^%s*(.-)%s*$", "%1")..'</span>' end;
     end);
 
     awful.spawn.easy_async_with_shell(config.commands.vol, function(o)

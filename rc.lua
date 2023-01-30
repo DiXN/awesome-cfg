@@ -7,8 +7,10 @@ local naughty = require('naughty');
 local config = require('helpers.config');
 local beautiful = require('beautiful');
 local key_bindings = require('helpers.keybindings')
+local dpi = beautiful.xresources.apply_dpi
 require('./errors')();
 
+awful.screen:set_auto_dpi_enabled(true)
 local beautiful = require("beautiful")
 beautiful.init(gears.filesystem.get_configuration_dir() .. '/bling_theme.lua')
 
@@ -23,14 +25,12 @@ local capi = {
 root.elements = root.elements or {}
 
 -- THEME
-beautiful.useless_gap = 3
+beautiful.useless_gap = dpi(3)
 beautiful.gab_single_client = true
 beautiful.border_width = 0
 
--- MODKEY
 modkey = 'Mod4'
 alt = 'Mod1'
-
 
 -- LAYOUTS
 tag.connect_signal('request::default_layouts', function()
@@ -40,6 +40,8 @@ tag.connect_signal('request::default_layouts', function()
     awful.layout.suit.floating,
     awful.layout.suit.max,
     awful.layout.suit.fair,
+    bling.layout.centered,
+    bling.layout.mstab
   });
 end);
 
@@ -514,7 +516,7 @@ for i = 0, 9 do
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
   awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
   awful.spawn.with_shell("nm-applet &");
-  awful.spawn.with_shell('instantmouse 0.19500');
+  awful.spawn.with_shell("bash -c 'instantmouse 0.19500'");
   awful.spawn.with_shell("numlockx");
   awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &");
 
