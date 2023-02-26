@@ -206,8 +206,12 @@ local config = {
   }
 };
 
-awful.spawn.easy_async_with_shell('which alacritty', function(o,e,r,c)
-  if c == 0 then config.commands.terminal = 'alacritty' end;
+awful.spawn.easy_async_with_shell('which wezterm', function(o,e,r,c)
+  if c == 0 then
+    config.commands.terminal = 'wezterm'
+  else
+    config.commands.terminal = 'alacritty'
+  end
 end);
 
 return config;
