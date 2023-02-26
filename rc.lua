@@ -42,8 +42,8 @@ tag.connect_signal('request::default_layouts', function()
     awful.layout.suit.fair,
     bling.layout.centered,
     bling.layout.mstab
-  });
-end);
+  })
+end)
 
 -- TAGS/LAYOUTS
 screen.connect_signal('request::desktop_decoration', function(s)
@@ -61,10 +61,10 @@ screen.connect_signal('request::desktop_decoration', function(s)
 end);
 
 -- ELEMENTS
-if not root.elements.hub then require('elements.hub')() end;
-if not root.elements.topbar then require('elements.topbar')() end;
-if not root.elements.tagswitcher then require('elements.tagswitch')() end;
-if not root.elements.powermenu then require('elements.powermenu')() end;
+if not root.elements.hub then require('elements.hub')() end
+if not root.elements.topbar then require('elements.topbar')() end
+if not root.elements.tagswitcher then require('elements.tagswitch')() end
+if not root.elements.powermenu then require('elements.powermenu')() end
 
 local bottom = true;
 
@@ -73,8 +73,8 @@ for _, key in ipairs(key_bindings) do
 end
 
 awful.keygrabber {
-  keybindings = {
-    {{ modkey }, 'r', function() awful.client.object.last_client = client.focus end}
+  keybindings        = {
+    { { modkey }, 'r', function() awful.client.object.last_client = client.focus end }
   },
   stop_key           = modkey,
   stop_event         = 'release',
@@ -84,7 +84,7 @@ awful.keygrabber {
     if c.last_client ~= nil then
       client.focus:swap(c.last_client)
       client.focus = c.last_client
-    end;
+    end
   end,
   export_keybindings = true,
 }
@@ -128,220 +128,219 @@ end
 -- TAG KEYBINDS
 for i = 0, 9 do
   local spot = i;
-  if(spot == 10) then spot = 0 end
+  if (spot == 10) then spot = 0 end
 
   awful.keyboard.append_global_keybindings({
     awful.key({ modkey }, spot, function()
       local tag = root.tags()[i];
-      if tag then tag:view_only() end;
+      if tag then tag:view_only() end
     end),
-    awful.key({ modkey, 'Shift'}, spot, function()
+    awful.key({ modkey, 'Shift' }, spot, function()
       local tag = root.tags()[i]
       if tag and client.focus then client.focus:move_to_tag(tag) end
       current_tag = awful.screen.focused().selected_tag
       tag:view_only()
 
       gears.timer {
-        timeout   = 0.1,
-        autostart = true,
+        timeout     = 0.1,
+        autostart   = true,
         single_shot = true,
-        callback  = function()
+        callback    = function()
           reset_mfact(current_tag)
           reset_mfact(tag)
         end
       }
+    end)
+  })
+end
 
-      end)
-    });
+awful.mouse.append_global_mousebindings({
+  awful.button({}, 1, function()
+    if root.elements.hub then root.elements.hub.close() end
+  end),
+  awful.button({}, 3, function()
+    root.elements.hub.enable_view_by_index(5, mouse.screen);
+  end),
+})
+
+client.connect_signal("mouse::enter", function(c)
+  if awful.layout.get() ~= awful.layout.suit.max then
+    c:activate { context = "mouse_enter", raise = false }
+    bling.module.flash_focus.flashfocus(c)
+  end
+end)
+
+local function get_tab_container()
+  local t = awful.screen.focused().selected_tag
+
+  if t ~= nil then
+    for _, c in ipairs(t:clients()) do
+      if c and c.bling_tabbed then return c.bling_tabbed end
+    end
   end
 
-  awful.mouse.append_global_mousebindings({
-    awful.button({}, 1, function()
-      if root.elements.hub then root.elements.hub.close() end
-    end),
-    awful.button({}, 3, function()
-      root.elements.hub.enable_view_by_index(5, mouse.screen);
-    end),
-  });
+  return nil
+end
 
-  client.connect_signal("mouse::enter", function(c)
-    if awful.layout.get() ~= awful.layout.suit.max then
-      c:activate { context = "mouse_enter", raise = false }
-      bling.module.flash_focus.flashfocus(c)
-    end
-  end)
+-- CLIENT KEYBINDS & BUTTONS
+client.connect_signal("request::default_keybindings", function(c)
+  awful.keyboard.append_client_keybindings({
+    awful.key({ modkey }, "q", function(c)
+      c.kill(c)
 
-  local function get_tab_container()
-    local t = awful.screen.focused().selected_tag
-
-    if t ~= nil then
-      for _, c in ipairs(t:clients()) do
-        if c and c.bling_tabbed then return c.bling_tabbed end
+      if c.pid and c.class == 'gamescope' then
+        awful.spawn("kill -15 " .. c.pid)
       end
-    end
+    end),
+    awful.key({ modkey, "Control" }, "Right", function(c) c:move_to_screen(c.screen.index + 1) end),
+    awful.key({ modkey, "Control" }, "Left", function(c) c:move_to_screen(c.screen.index - 1) end),
+    awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
+    awful.key({ modkey, "Shift" }, "f", function(c)
+      c.fake_full = not c.fake_full
+      if c.fake_full then c.fullscreen = true end
+    end),
+    awful.key({ modkey }, 'y', function(c) bling.module.tabbed.init(c) end),
+    awful.key({ modkey, "Control" }, 'r', function(c)
+      bling.module.tabbed.add(c, get_tab_container())
+      reset_mfact()
+    end),
+    awful.key({ modkey, alt }, 'r', function(c)
+      bling.module.tabbed.remove(c)
+      reset_mfact()
+    end),
+  })
+end)
 
-    return nil
-  end
+client.connect_signal("request::default_mousebindings", function(c)
+  awful.mouse.append_client_mousebindings({
+    awful.button({}, 1, function(c)
+      if root.elements.hub then root.elements.hub.close() end
 
-  -- CLIENT KEYBINDS & BUTTONS
-  client.connect_signal("request::default_keybindings", function(c)
-    awful.keyboard.append_client_keybindings({
-      awful.key({ modkey }, "q", function (c)
-        c.kill(c)
+      if awful.layout.get() ~= awful.layout.suit.max then
+        c:activate { context = "mouse_move", raise = true }
+      else
+        c:activate { context = "mouse_click", raise = true }
+      end
+    end),
+    awful.button({ modkey }, 1, function(c)
+      if not c.floating then c.floating = true end
+      c.above = true
+      c.ontop = true
+      c:activate { context = "mouse_click", action = "mouse_move" }
+    end),
+    awful.button({ modkey, "Shift" }, 1, function(c)
+      if not c.floating then c.floating = true end
 
-        if c.pid and c.class == 'gamescope' then
-          awful.spawn("kill -15 " .. c.pid)
-        end
-      end),
-      awful.key({ modkey, "Control" }, "Right", function(c) c:move_to_screen(c.screen.index+1) end),
-      awful.key({ modkey, "Control" }, "Left", function(c) c:move_to_screen(c.screen.index-1) end),
-      awful.key({ modkey, "Control" }, "f", function(c) c.fullscreen = not c.fullscreen end),
-      awful.key({ modkey, "Shift" }, "f", function(c)
-        c.fake_full = not c.fake_full
-        if c.fake_full then c.fullscreen = true end
-      end),
-      awful.key({ modkey }, 'y', function(c) bling.module.tabbed.init(c) end),
-      awful.key({ modkey, "Control" }, 'r', function(c)
-        bling.module.tabbed.add(c, get_tab_container())
-        reset_mfact()
-      end),
-      awful.key({ modkey, alt }, 'r', function(c)
-        bling.module.tabbed.remove(c)
-        reset_mfact()
-      end),
-    });
-  end);
+      if c.above then c.above = false end
+      if c.ontop then c.ontop = false end
 
-  client.connect_signal("request::default_mousebindings", function(c)
-    awful.mouse.append_client_mousebindings({
-      awful.button({}, 1, function (c)
-        if root.elements.hub then root.elements.hub.close() end
+      c:activate { context = "mouse_click", action = "mouse_move" }
+    end),
+    awful.button({ modkey, "Shift" }, 3, function(c)
+      if not c.minimized then c.minimized = true end
+    end),
+    awful.button({ modkey }, 3, awful.mouse.client.resize),
+    awful.button({ modkey }, 2, function(c)
+      if c.floating then
+        c.floating = false
+        c:emit_signal("tiled")
+      end
+    end),
+    awful.button({ modkey, "Shift" }, 4, function()
+      awful.client.swap.byidx(1);
+    end),
+    awful.button({ modkey, "Shift" }, 5, function()
+      awful.client.swap.byidx( -1);
+    end),
+    awful.button({ modkey }, 4, function()
+      bling.module.tabbed.iter()
+    end),
+    awful.button({ modkey }, 5, function()
+      bling.module.tabbed.iter()
+    end)
+  })
+end)
 
-        if awful.layout.get() ~= awful.layout.suit.max then
-          c:activate { context = "mouse_move", raise = true }
-        else
-          c:activate { context = "mouse_click", raise = true }
-        end
-      end),
-      awful.button({ modkey }, 1, function (c)
-        if not c.floating then c.floating = true end
-        c.above = true
-        c.ontop = true
-        c:activate { context = "mouse_click", action = "mouse_move" }
-      end),
-      awful.button({ modkey, "Shift" }, 1, function (c)
-        if not c.floating then c.floating = true end
-
-        if c.above then c.above = false end
-        if c.ontop then c.ontop = false end
-
-        c:activate { context = "mouse_click", action = "mouse_move" }
-      end),
-      awful.button({ modkey, "Shift" }, 3, function (c)
-        if not c.minimized then c.minimized = true end
-      end),
-      awful.button({ modkey }, 3, awful.mouse.client.resize),
-      awful.button({ modkey }, 2, function (c)
-        if c.floating then
-          c.floating = false
-          c:emit_signal("tiled")
-        end
-      end),
-      awful.button({ modkey, "Shift" }, 4, function()
-        awful.client.swap.byidx(1);
-      end),
-      awful.button({ modkey, "Shift" }, 5, function()
-        awful.client.swap.byidx(-1);
-      end),
-      awful.button({ modkey }, 4, function()
-        bling.module.tabbed.iter()
-      end),
-      awful.button({ modkey }, 5, function()
-        bling.module.tabbed.iter()
-      end)
-    });
-  end);
-
-  -- RULES
-  ruled.client.connect_signal("request::rules", function()
-    -- All clients will match this rule.
-    ruled.client.append_rule {
-      id         = "global",
-      rule       = { },
-      properties = {
-        focus     = awful.client.focus.filter,
-        raise     = true,
-        screen    = awful.screen.preferred,
-        placement = awful.placement.no_overlap+awful.placement.no_offscreen,
-        fake_full = false
-      }
+-- RULES
+ruled.client.connect_signal("request::rules", function()
+  -- All clients will match this rule.
+  ruled.client.append_rule {
+    id         = "global",
+    rule       = {},
+    properties = {
+      focus     = awful.client.focus.filter,
+      raise     = true,
+      screen    = awful.screen.preferred,
+      placement = awful.placement.no_overlap + awful.placement.no_offscreen,
+      fake_full = false
     }
+  }
 
-    ruled.client.append_rule {
-      rule_any = {
-        class = { "brave-browser", "Brave-browser", "virt-manager", "Virt-manager" }
-      },
-      properties = {
-        fake_full = true
-      }
+  ruled.client.append_rule {
+    rule_any = {
+      class = { "brave-browser", "Brave-browser", "virt-manager", "Virt-manager" }
+    },
+    properties = {
+      fake_full = true
     }
+  }
 
-    -- Floating clients.
-    ruled.client.append_rule {
-      id       = "floating",
-      rule_any = {
-        instance = { "copyq", "pinentry" },
-        class    = {
-          "Arandr", "Blueman-manager", "Gpick", "Kruler", "Sxiv",
-          "Tor Browser", "Wpa_gui", "veromix", "xtightvncviewer",
-          "Nautilus", "Pavucontrol"
-        },
-        name    = {
-          "Event Tester",
-          "Media viewer"
-        },
-        role    = {
-          "AlarmWindow",
-          "ConfigManager",
-          "pop-up"
-        },
-        type = {
-          "dialog"
-        }
+  -- Floating clients.
+  ruled.client.append_rule {
+    id         = "floating",
+    rule_any   = {
+      instance = { "copyq", "pinentry" },
+      class    = {
+        "Arandr", "Blueman-manager", "Gpick", "Kruler", "Sxiv",
+        "Tor Browser", "Wpa_gui", "veromix", "xtightvncviewer",
+        "Nautilus", "Pavucontrol"
       },
-      properties = {
-        raise = true,
-        floating = true,
-        above = true,
-        ontop = true,
-        placement = awful.placement.centered
+      name     = {
+        "Event Tester",
+        "Media viewer"
+      },
+      role     = {
+        "AlarmWindow",
+        "ConfigManager",
+        "pop-up"
+      },
+      type     = {
+        "dialog"
       }
+    },
+    properties = {
+      raise = true,
+      floating = true,
+      above = true,
+      ontop = true,
+      placement = awful.placement.centered
     }
+  }
 
-    ruled.client.append_rule {
-      rule_any = {
-        class = { "csgo_linux64", "love", "steam_app_311210", "mpv", "openrct2", "Parkitect.x86_64" }
-      },
-      properties = {
-        raise = true,
-        fullscreen = true,
-        hover_focus = false,
-        callback = function(c)
-          if c.minimized == true then
-            c.minimized = false
-          end
+  ruled.client.append_rule {
+    rule_any = {
+      class = { "csgo_linux64", "love", "steam_app_311210", "mpv", "openrct2", "Parkitect.x86_64" }
+    },
+    properties = {
+      raise = true,
+      fullscreen = true,
+      hover_focus = false,
+      callback = function(c)
+        if c.minimized == true then
+          c.minimized = false
+        end
 
-          awful.spawn.with_shell("systenctl --user restart jack-carla-rack");
+        awful.spawn.with_shell("systemctl --user restart easyeffects");
 
-          function spawn_picom()
-            awful.spawn.easy_async_with_shell("pgrep picom", function(o)
-              if o == '' then
-                awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
-              end
-            end)
-          end
+        function spawn_picom()
+          awful.spawn.easy_async_with_shell("pgrep picom", function(o)
+            if o == '' then
+              awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
+            end
+          end)
+        end
 
-          local fullscreen_timer = gears.timer {
+        local fullscreen_timer = gears.timer {
             timeout   = 2,
             autostart = true,
             callback  = function()
@@ -353,28 +352,29 @@ for i = 0, 9 do
             end
           }
 
-          ignored_clients = { "csgo_linux64", "love", "steam_app_311210" }
+        ignored_clients = { "csgo_linux64", "love", "steam_app_311210" }
 
-          ignored = false
+        ignored = false
 
-          for _, ignored_client in ipairs(ignored_clients) do
-              if ignored_client == c.class then
-                  ignored = true
-              end
+        for _, ignored_client in ipairs(ignored_clients) do
+          if ignored_client == c.class then
+            ignored = true
           end
+        end
 
-          if ignored == false then
-            local time_tracker = gears.timer {
-              timeout   = 2,
+        if ignored == false then
+          local time_tracker = gears.timer {
+              timeout     = 2,
               single_shot = true,
-              autostart = true,
-              callback  = function()
-                awful.spawn.easy_async_with_shell("~/Documents/time-tracker.vsh --insert " .. c.class, function(stdout, stderr, reason, exit_code)
-                  naughty.notify({ title = 'TimeTracker', text = stdout, timeout = 0 })
-                end)
+              autostart   = true,
+              callback    = function()
+                awful.spawn.easy_async_with_shell("~/Documents/time-tracker.vsh --insert " .. c.class,
+                  function(stdout, stderr, reason, exit_code)
+                    naughty.notify({ title = 'TimeTracker', text = stdout, timeout = 0 })
+                  end)
               end
             }
-          end
+        end
 
         client.connect_signal("unmanage", function(c_unmanage)
           if c == c_unmanage then
@@ -382,157 +382,156 @@ for i = 0, 9 do
             spawn_picom()
           end
         end)
-
-        end
-      }
-    }
-
-    ruled.client.append_rule {
-      id         = "titlebars",
-      rule_any   = { type = { "normal", "dialog" } },
-      properties = { titlebars_enabled = true      }
-    }
-  end);
-
-  -- NOTIFICATIONS
-  ruled.notification.connect_signal('request::rules', function()
-    ruled.notification.append_rule {
-      rule = {},
-      properties = { timeout = 0 }
-    }
-  end);
-
-  function count_clients(consider_floats, focused_tag)
-    local n = 0
-
-    local t = focused_tag or awful.screen.focused().selected_tag
-
-    if t ~= nil then
-      for _, c in ipairs(t:clients()) do
-        if (c.floating == true or c.minimized == true) and consider_floats == true then goto skip end
-        n = n + 1
-        ::skip::
       end
-    end
+    }
+  }
 
-    return n
+  ruled.client.append_rule {
+    id         = "titlebars",
+    rule_any   = { type = { "normal", "dialog" } },
+    properties = { titlebars_enabled = true }
+  }
+end);
+
+-- NOTIFICATIONS
+ruled.notification.connect_signal('request::rules', function()
+  ruled.notification.append_rule {
+    rule = {},
+    properties = { timeout = 0 }
+  }
+end)
+
+function count_clients(consider_floats, focused_tag)
+  local n = 0
+
+  local t = focused_tag or awful.screen.focused().selected_tag
+
+  if t ~= nil then
+    for _, c in ipairs(t:clients()) do
+      if (c.floating == true or c.minimized == true) and consider_floats == true then goto skip end
+      n = n + 1
+      ::skip::
+    end
   end
 
-  client.connect_signal("manage", function(c)
-    if bottom then awful.client.setslave(c) end
+  return n
+end
 
-    c.shape = function(cr,w,h)
-      gears.shape.rounded_rect(cr, w, h, 6)
-    end
+client.connect_signal("manage", function(c)
+  if bottom then awful.client.setslave(c) end
 
-    c:emit_signal("client_change")
-  end)
+  c.shape = function(cr, w, h)
+    gears.shape.rounded_rect(cr, w, h, 6)
+  end
 
-  client.connect_signal("unmanage", function(c)
-    c:emit_signal("client_change")
-  end)
+  c:emit_signal("client_change")
+end)
 
-  client.connect_signal("client_change", function()
-    reset_mfact()
-    setup_columns()
+client.connect_signal("unmanage", function(c)
+  c:emit_signal("client_change")
+end)
 
-    -- https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/ggjom5n?utm_source=share&utm_medium=web2x&context=3
-    local s = awful.screen.focused()
-    local c = awful.client.focus.history.get(s, 0)
-    if c == nil then return end
-    awful.client.focus.byidx(0, c)
-  end)
+client.connect_signal("client_change", function()
+  reset_mfact()
+  setup_columns()
 
-  client.disconnect_signal("request::geometry", awful.ewmh.geometry)
-  client.connect_signal("request::geometry", function(c, context, ...)
-    if context ~= "fullscreen" then
-      awful.ewmh.geometry(c, context, ...)
+  -- https://www.reddit.com/r/awesomewm/comments/k5otdr/raise_2nd_highest_client_window_on_close/ggjom5n?utm_source=share&utm_medium=web2x&context=3
+  local s = awful.screen.focused()
+  local c = awful.client.focus.history.get(s, 0)
+  if c == nil then return end
+  awful.client.focus.byidx(0, c)
+end)
+
+client.disconnect_signal("request::geometry", awful.ewmh.geometry)
+client.connect_signal("request::geometry", function(c, context, ...)
+  if context ~= "fullscreen" then
+    awful.ewmh.geometry(c, context, ...)
+  else
+    if c.fake_full then
+      local geo = c:geometry()
+
+      c:geometry({
+        width = geo.width,
+        height = geo.height - 1
+      })
+
+      gears.timer {
+        timeout     = 0.2,
+        autostart   = true,
+        single_shot = true,
+        callback    = function()
+          geo.height = geo.height + 1
+          c.fullscreen = false
+        end
+      }
     else
-      if c.fake_full then
-        local geo = c:geometry()
-
-        c:geometry({
-          width = geo.width,
-          height = geo.height - 1
-        })
-
-        gears.timer {
-          timeout   = 0.2,
-          autostart = true,
-          single_shot = true,
-          callback  = function()
-            geo.height = geo.height + 1
-            c.fullscreen = false
-          end
-        }
-      else
-        awful.ewmh.geometry(c, context, ...)
-      end
+      awful.ewmh.geometry(c, context, ...)
     end
-  end)
+  end
+end)
 
-  client.connect_signal("property::fullscreen", function(c)
-    if c.floating and c.fullscreen == false then
-      c.above = true
-      c.ontop = true
+client.connect_signal("property::fullscreen", function(c)
+  if c.floating and c.fullscreen == false then
+    c.above = true
+    c.ontop = true
+  end
+
+  if c.fake_full == false and c.fullscreen then
+    c.shape = function(cr, w, h)
+      gears.shape.rounded_rect(cr, w, h, 0)
     end
+  end
+end)
 
-    if c.fake_full == false and c.fullscreen then
-      c.shape = function(cr,w,h)
-        gears.shape.rounded_rect(cr, w, h, 0)
-      end
+client.connect_signal("property::minimized", function(c) reset_mfact() end)
+
+-- switch to client of other tag
+client.connect_signal("request::activate", function(c)
+  if c then
+    local client_tag = c.first_tag
+    local current_tag = awful.screen.focused().selected_tag
+
+    if client_tag and client_tag ~= current_tag then
+      client_tag:view_only()
     end
-  end)
+  end
+end)
 
-  client.connect_signal("property::minimized", function(c) reset_mfact() end)
+client.connect_signal("property::floating", function(c) reset_mfact() end)
 
-  -- switch to client of other tag
-  client.connect_signal("request::activate", function(c)
-    if c then
-      local client_tag = c.first_tag
-      local current_tag = awful.screen.focused().selected_tag
+client.connect_signal("tiled", function(c)
+  c.ontop = false
+end)
 
-      if client_tag and client_tag ~= current_tag then
-        client_tag:view_only()
-      end
+client.connect_signal("reset_fullscreen", function(c)
+  if c.fake_full == false and c.fullscreen then
+    c.fullscreen = not c.fullscreen
+    c:emit_signal("tiled")
+  end
+end)
+
+-- SPAWNS
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
+awful.spawn.with_shell("nm-applet &");
+awful.spawn.with_shell("bash -c 'instantmouse 0.19500'");
+awful.spawn.with_shell("numlockx");
+awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &");
+
+-- IDLE
+awful.spawn.with_line_callback(config.commands.idle, {
+  stdout = function(o)
+    if o == 'lock' and root.elements.powermenu then
+      root.elements.powermenu.lock();
+    elseif o == 'suspend' then
+      awful.spawn(config.commands.suspend)
     end
-  end)
+  end
+})
 
-  client.connect_signal("property::floating", function(c) reset_mfact() end)
+os.execute('sleep 0.1');
+if root.elements.topbar then root.elements.topbar.show() end
 
-  client.connect_signal("tiled", function(c)
-    c.ontop = false
-  end)
-
-  client.connect_signal("reset_fullscreen", function(c)
-    if c.fake_full == false and c.fullscreen then
-      c.fullscreen = not c.fullscreen
-      c:emit_signal("tiled")
-    end
-  end)
-
-  -- SPAWNS
-  awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
-  awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
-  awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
-  awful.spawn.with_shell("nm-applet &");
-  awful.spawn.with_shell("bash -c 'instantmouse 0.19500'");
-  awful.spawn.with_shell("numlockx");
-  awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &");
-
-  -- IDLE
-  awful.spawn.with_line_callback(config.commands.idle, {
-    stdout = function(o)
-      if o == 'lock' and root.elements.powermenu then
-        root.elements.powermenu.lock();
-      elseif o == 'suspend' then
-        awful.spawn(config.commands.suspend);
-      end
-    end
-  });
-
-  os.execute('sleep 0.1');
-  if root.elements.topbar then root.elements.topbar.show() end;
-
-  awful.layout.set(awful.layout.suit.max)
-  awful.layout.set(awful.layout.suit.tile)
+awful.layout.set(awful.layout.suit.max)
+awful.layout.set(awful.layout.suit.tile)
