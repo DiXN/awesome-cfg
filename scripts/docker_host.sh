@@ -8,7 +8,7 @@ if [[ -f /.dockerenv && ! -f "/tmp/docker_run" ]]; then
   echo "XDG_RUNTIME_DIR=/run/user/1000" | sudo tee -a /etc/environment
 
   # DISABLE GPU for Alacritty
-  ACCELERATED=$(glxinfo -B | awk '/Accelerated:/{ print $2 }')
+  ACCELERATED=$(glxinfo -B | awk '/direct rendering:/{ print tolower($3) }')
 
   if [ "$ACCELERATED" = "no" ]; then
     ! grep "LIBGL_ALWAYS_SOFTWARE=1" /etc/environment && echo "LIBGL_ALWAYS_SOFTWARE=1" | sudo tee -a /etc/environment
@@ -16,8 +16,6 @@ if [[ -f /.dockerenv && ! -f "/tmp/docker_run" ]]; then
 
   readonly DOTFILES_ROOT="$HOME/Documents/repos/dotfiles"
   git -C "$DOTFILES_ROOT" pull
-
-  alacritty -e "nvim" "$DOTFILES_ROOT" &
 
   PASSWD="$(zenity --password)"
 
