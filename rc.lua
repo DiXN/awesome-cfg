@@ -511,13 +511,10 @@ client.connect_signal("reset_fullscreen", function(c)
 end)
 
 -- SPAWNS
-awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh");
-awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh");
-awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh");
-awful.spawn.with_shell("nm-applet &");
-awful.spawn.with_shell("bash -c 'instantmouse 0.19500'");
-awful.spawn.with_shell("numlockx");
-awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &");
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/wallpaper.sh")
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/compositor.sh")
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/docker_host.sh")
+awful.spawn.with_shell("$HOME/.config/awesome/scripts/autostart.sh")
 
 -- IDLE
 awful.spawn.with_line_callback(config.commands.idle, {
